@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#3A2340">
+<title>居家體態訓練</title>
+<style>
+:root{
+  --bg:#F6EDEF; --ink:#2E1A33; --muted:#7A6480; --line:#E4D4DA;
+  --plum:#3A2340; --plum2:#4A2F52; --cream:#F7E6EA; --rose:#B98AA0; --amber:#EDA84A;
+  --serif:"Songti TC","Noto Serif TC","Noto Serif CJK TC",serif;
+  --sans:"PingFang TC","Noto Sans TC","Noto Sans CJK TC",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.wrap{max-width:520px;margin:0 auto;padding:14px 18px 120px}
+
+/* 分頁 */
+.tabs{display:flex;gap:6px;background:#EBDDE2;border-radius:999px;padding:4px;margin-bottom:18px}
+.tabs button{flex:1;border:0;background:none;padding:9px 0;border-radius:999px;font-size:15px;color:var(--muted)}
+.tabs button[aria-selected=true]{background:var(--plum);color:var(--cream)}
+
+.date{font-size:14px;color:var(--muted);margin:0 0 2px}
+h1{font-family:var(--serif);font-size:34px;line-height:1.15;margin:0 0 6px;font-weight:700;letter-spacing:.02em}
+.sub{font-size:15px;color:var(--muted);margin:0 0 16px;line-height:1.5}
+
+/* 語音設定 */
+.vset{display:block;margin:-8px 0 14px auto;border:1px solid var(--line);background:none;border-radius:999px;padding:5px 12px;font-size:13px;color:var(--muted)}
+.vrow{display:flex;align-items:center;gap:10px;margin:14px 0 2px;font-size:15px}
+.vrow span{width:40px;flex:none;font-weight:600}
+.vrow select{flex:1;font:inherit;font-size:15px;padding:8px;border-radius:10px;border:1px solid var(--line);background:#fff;min-width:0}
+.vrow input[type=range]{flex:1;accent-color:var(--plum)}
+.vrow small{width:52px;text-align:right;color:var(--muted)}
+.vends{display:flex;justify-content:space-between;margin:0 62px 0 50px;font-size:12px;color:var(--muted)}
+
+.vtest{border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.7;margin-bottom:12px}
+.vtest .ok::before{content:'✓ ';color:#3E8E63;font-weight:700}
+.vtest .bad::before{content:'✗ ';color:#C0392B;font-weight:700}
+.vtest .wait::before{content:'… ';color:var(--muted)}
+
+/* 今天會用到 */
+.gear{border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin:-12px 0 22px;display:grid;gap:8px}
+.gear b{font-size:14px}
+.gear div{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.gear i{font-style:normal;font-size:12px;color:var(--muted);width:34px}
+.gear span{font-size:13px;background:#EBDDE2;border-radius:999px;padding:3px 10px}
+
+/* 星期 */
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
+.week button{border:1px solid var(--line);background:transparent;border-radius:12px;padding:6px 0 7px;display:flex;flex-direction:column;align-items:center;gap:1px}
+.week b{font-size:15px;font-weight:600}
+.week span{font-size:11px;color:var(--muted)}
+.week button.today b{text-decoration:underline;text-underline-offset:3px}
+.week button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--cream)}
+.week button[aria-pressed=true] span{color:#D9C3CB}
+
+.level{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:18px}
+.level button{flex:1;border:0;background:none;padding:8px 0;font-size:13px;color:var(--muted)}
+.level button+button{border-left:1px solid var(--line)}
+.level button[aria-pressed=true]{background:#EBDDE2;color:var(--ink);font-weight:600}
+
+/* 舞台 */
+.stage{background:var(--plum);border-radius:28px;position:relative;overflow:hidden}
+.stage svg{display:block;width:100%;height:auto;aspect-ratio:300/210}
+.stage .tag{position:absolute;left:14px;top:12px;font-size:12px;color:#CFB6C1;background:rgba(255,255,255,.08);padding:3px 9px;border-radius:999px}
+.fig{fill:none;stroke:var(--cream);stroke-linecap:round;stroke-linejoin:round}
+.far{stroke:var(--rose)}
+.head{fill:var(--cream)}
+.floor{stroke:#6E5277;stroke-width:1.5}
+.mat{fill:var(--plum2)}
+.prop{fill:#58395F}
+.wall{fill:#452B4C}
+.band{stroke:var(--amber);fill:none;stroke-linecap:round}
+.db{fill:var(--amber)}
+.glow{fill:var(--amber)}
+
+.hero .cap{position:absolute;left:18px;right:18px;bottom:14px;color:var(--cream);font-size:13px;opacity:.8}
+.start{display:block;width:100%;margin:14px 0 26px;border:0;border-radius:18px;background:var(--amber);color:var(--ink);font-size:18px;font-weight:700;padding:16px}
+
+/* 清單 */
+h2{font-family:var(--serif);font-size:20px;margin:22px 0 4px;font-weight:700}
+ol.list{list-style:none;margin:0;padding:0;counter-reset:n}
+ol.list li{border-bottom:1px solid var(--line)}
+ol.list button{width:100%;text-align:left;background:none;border:0;padding:13px 0;display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:6px}
+ol.list .n{font-family:var(--serif);color:var(--muted);font-size:15px}
+ol.list .nm{font-size:16px;font-weight:600}
+ol.list .ds{display:block;font-size:13px;color:var(--muted);font-weight:400;margin-top:2px}
+ol.list .src{font-size:11px;color:#8C5A73;border:1px solid #DDBFCB;border-radius:999px;padding:2px 7px;white-space:nowrap}
+.note{font-size:13px;color:var(--muted);line-height:1.6;margin:18px 0 0}
+
+/* 動作說明 */
+.sheet{position:fixed;inset:0;background:rgba(46,26,51,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet .box{background:var(--bg);width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:26px 26px 0 0;padding:16px 18px 34px}
+.sheet h3{font-family:var(--serif);font-size:26px;margin:16px 0 4px}
+.sheet .meta{font-size:14px;color:var(--muted);margin:0 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.chips span{font-size:12px;background:#EBDDE2;border-radius:999px;padding:3px 10px}
+.sheet h4{font-size:15px;margin:18px 0 6px}
+.sheet ol,.sheet ul{margin:0;padding-left:20px;line-height:1.7;font-size:15px}
+.close{border:0;background:#EBDDE2;border-radius:999px;padding:6px 14px;font-size:14px;float:right}
+
+/* 跟練 */
+.player{position:fixed;inset:0;background:var(--plum);color:var(--cream);z-index:30;display:flex;flex-direction:column;overflow:auto}
+.player .in{max-width:520px;width:100%;margin:0 auto;padding:12px 16px 28px;display:flex;flex-direction:column;flex:1}
+.ptop{display:flex;align-items:center;gap:10px;font-size:14px;color:#CFB6C1}
+.ptop button{border:0;background:rgba(255,255,255,.1);border-radius:999px;padding:6px 12px;color:var(--cream);font-size:14px}
+.ptop .grow{flex:1}
+.bar{height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:10px 0 6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--amber);width:0}
+.player .stage{background:transparent;border-radius:0;margin:0 -16px}
+.player .stage.dim svg{opacity:.45}
+.pname{font-family:var(--serif);font-size:28px;margin:4px 0 2px;font-weight:700}
+.pstate{font-size:15px;color:#CFB6C1;min-height:22px}
+.big{display:flex;align-items:baseline;gap:8px;margin:6px 0 2px}
+.big b{font-size:64px;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
+.big span{font-size:20px;color:#CFB6C1}
+.pcue{font-size:16px;line-height:1.5;min-height:48px;color:var(--cream)}
+.ctrl{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:10px;margin-top:auto;padding-top:16px}
+.ctrl button{border:0;border-radius:16px;padding:15px 0;font-size:16px;background:rgba(255,255,255,.1);color:var(--cream)}
+.ctrl .main{background:var(--amber);color:var(--ink);font-weight:700}
+
+.pmeta{display:grid;gap:6px;margin:10px 0 4px}
+.pmeta div{font-size:15px;line-height:1.45;color:var(--cream)}
+.pmeta span{display:inline-block;min-width:44px;margin-right:8px;font-size:12px;color:var(--ink);background:#CFB6C1;border-radius:6px;padding:1px 6px;text-align:center}
+.pbrief{margin:10px 0 0;padding:0;list-style:none;counter-reset:b}
+.pbrief li{counter-increment:b;position:relative;padding:7px 0 7px 32px;font-size:17px;line-height:1.45;border-top:1px solid rgba(255,255,255,.08)}
+.pbrief li::before{content:counter(b);position:absolute;left:0;top:7px;width:22px;height:22px;border-radius:50%;background:var(--amber);color:var(--ink);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.pcue:empty{display:none}
+details.how{margin-top:14px;font-size:15px;line-height:1.7;color:#E8D6DC}
+details.how summary{cursor:pointer;color:#CFB6C1}
+details.how ol{padding-left:20px;margin:8px 0}
+.done{text-align:center;margin:auto 0}
+.done h2{font-size:34px;margin:0 0 8px}
+.done p{color:#CFB6C1;font-size:16px;line-height:1.6}
+
+/* 臉部運動 */
+.fx-puff{fill:#7A5584;stroke:var(--cream);stroke-width:2}
+.fx-mouth{fill:none;stroke:var(--cream);stroke-width:3;stroke-linejoin:round}
+.fx-mouth.open{fill:#2A1730}
+.fx-arrow{fill:none;stroke:var(--amber);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.fx-finger{fill:none;stroke:var(--amber);stroke-width:7;stroke-linecap:round;opacity:.6}
+.fx-glow{fill:var(--amber)}
+
+/* 呼吸提示 */
+.breath[hidden]{display:none}
+.breath{display:inline-block;align-self:flex-start;font-size:15px;font-weight:700;padding:4px 14px;border-radius:999px;margin:2px 0 6px;transition:background .3s}
+.breath[data-w=in]{background:#5E7FA0;color:#fff}
+.breath[data-w=out]{background:var(--amber);color:var(--ink)}
+
+/* 呼吸光圈 */
+.player .stage{position:relative}
+.player .stage svg{position:relative;z-index:1}
+.orb{position:absolute;left:50%;top:50%;width:78%;aspect-ratio:1;border-radius:50%;z-index:0;opacity:0;
+  transform:translate(-50%,-50%) scale(.5);transition:background-color .6s;pointer-events:none;
+  background:radial-gradient(circle,currentColor 0%,currentColor 30%,transparent 70%)}
+.orb[data-w=in]{color:#6E93B8}
+.orb[data-w=out]{color:#EDA84A}
+.big{align-items:baseline}
+.big .breath{margin-left:auto;align-self:center}
+
+/* 刮痧臉部 */
+.face-line{fill:none;stroke:var(--cream);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.face-hair{fill:var(--plum2)}
+.face-skin{fill:#4E3356;stroke:var(--cream);stroke-width:3}
+.trail{fill:none;stroke:var(--amber);stroke-width:6;stroke-linecap:round;opacity:.55}
+.guide{fill:none;stroke:var(--amber);stroke-width:2;stroke-dasharray:3 6;opacity:.5}
+.tool{fill:var(--amber)}
+@media (prefers-reduced-motion:reduce){.sheet .box{transition:none}}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ---------- 人形動畫引擎 ----------
+const LEN = { T: 56, UA: 27, FA: 25, TH: 40, SH: 40, NK: 15, HR: 10 };
+const rad = d => d * Math.PI / 180;
+
+function normLimb(s) {
+  if (!s) return s;
+  const o = { ...s };
+  if (o.a && !o.s) o.s = [1, 1];
+  if (o.t && o.b === undefined) o.b = 1;
+  return o;
+}
+function normFrame(f) {
+  const o = { arch: 0, hd: 0, sw: 0, hw: 0, glow: 0, ...f };
+  ['aN', 'aF', 'lN', 'lF'].forEach(k => (o[k] = normLimb(o[k])));
+  return o;
+}
+function lerp(a, b, t) {
+  if (typeof a === 'number') return typeof b === 'number' ? a + (b - a) * t : a;
+  if (Array.isArray(a)) return a.map((v, i) => lerp(v, b ? b[i] : v, t));
+  if (a && typeof a === 'object') {
+    const o = {};
+    for (const k in a) o[k] = b && k in b ? lerp(a[k], b[k], t) : a[k];
+    return o;
+  }
+  return a;
+}
+function limbPts(base, spec, L1, L2) {
+  if (spec.a) {
+    const s = spec.s || [1, 1];
+    const j = [base[0] + L1 * s[0] * Math.cos(rad(spec.a[0])), base[1] + L1 * s[0] * Math.sin(rad(spec.a[0]))];
+    const e = [j[0] + L2 * s[1] * Math.cos(rad(spec.a[1])), j[1] + L2 * s[1] * Math.sin(rad(spec.a[1]))];
+    return [j, e];
+  }
+  const dx = spec.t[0] - base[0], dy = spec.t[1] - base[1];
+  let d = Math.hypot(dx, dy) || 0.001;
+  const ux = dx / d, uy = dy / d;
+  if (d >= L1 + L2 - 0.5) {
+    return [[base[0] + ux * L1, base[1] + uy * L1], [base[0] + ux * (L1 + L2), base[1] + uy * (L1 + L2)]];
+  }
+  d = Math.max(d, Math.abs(L1 - L2) + 1);
+  const along = (L1 * L1 - L2 * L2 + d * d) / (2 * d);
+  const h = Math.sqrt(Math.max(0, L1 * L1 - along * along));
+  const b = spec.b || 1;
+  const j = [base[0] + ux * along - uy * h * b, base[1] + uy * along + ux * h * b];
+  return [j, [spec.t[0], spec.t[1]]];
+}
+
+const easeSine = t => 0.5 - 0.5 * Math.cos(Math.PI * t);
+
+const TEMPO = 1.25; // 動作放慢，初學者較好控制
+function cycleLen(ex) { return ex.dur.reduce((a, b) => a + b, 0) * TEMPO; }
+
+function poseAt(ex, ms) {
+  const F = ex._frames || (ex._frames = ex.frames.map(normFrame));
+  const n = F.length;
+  if (n === 1) return F[0];
+  ms = ms / TEMPO;
+  const total = cycleLen(ex) / TEMPO;
+  let t = ((ms % total) + total) % total;
+  let i = 0;
+  while (t > ex.dur[i]) { t -= ex.dur[i]; i++; }
+  const k = ex.dur[i] ? t / ex.dur[i] : 0;
+  return lerp(F[i], F[(i + 1) % n], ex.ease === 'linear' ? k : easeSine(k));
+}
+
+// 目前在第幾段動畫、該段進度 0–1
+function segInfo(ex, ms) {
+  const tot = cycleLen(ex) / TEMPO;
+  let t = (((ms / TEMPO) % tot) + tot) % tot;
+  let i = 0;
+  while (i < ex.dur.length - 1 && t > ex.dur[i]) { t -= ex.dur[i]; i++; }
+  return { i, k: ex.dur[i] ? Math.min(1, t / ex.dur[i]) : 0 };
+}
+// 呼吸深度 0（吐盡）–1（吸飽），給呼吸光圈用
+function breathLevel(ex, ms) {
+  const { i, k } = segInfo(ex, ms), B = ex.breath;
+  if (B[i] === 'in') return { lv: easeSine(k), w: 'in' };
+  if (B[i] === 'out') return { lv: 1 - easeSine(k), w: 'out' };
+  for (let j = 1; j <= B.length; j++) {
+    const w = B[(i - j + B.length) % B.length];
+    if (w) return { lv: w === 'in' ? 1 : 0, w: w === 'in' ? 'hold-in' : 'hold-out' };
+  }
+  return { lv: 0.5, w: null };
+}
+function segAt(ex, ms) {
+  let t = ((ms / TEMPO) % (cycleLen(ex) / TEMPO) + cycleLen(ex) / TEMPO) % (cycleLen(ex) / TEMPO);
+  let i = 0;
+  while (i < ex.dur.length - 1 && t > ex.dur[i]) { t -= ex.dur[i]; i++; }
+  return i;
+}
+
+const P = p => p[0].toFixed(1) + ',' + p[1].toFixed(1);
+const pl = (pts, cls, w) => `<polyline points="${pts.map(P).join(' ')}" class="${cls}" stroke-width="${w}"/>`;
+
+function skeleton(ex, f) {
+  const dir = [Math.cos(rad(f.t)), Math.sin(rad(f.t))];
+  const perp = [-dir[1], dir[0]];
+  const hip = f.p;
+  const sh = [hip[0] + LEN.T * dir[0], hip[1] + LEN.T * dir[1]];
+  const off = (pt, w) => [pt[0] + perp[0] * w, pt[1] + perp[1] * w];
+  const hipN = off(hip, f.hw / 2), hipF = off(hip, -f.hw / 2);
+  const shN = off(sh, f.sw / 2), shF = off(sh, -f.sw / 2);
+  const ha = rad(f.t + f.hd);
+  const head = [sh[0] + LEN.NK * Math.cos(ha), sh[1] + LEN.NK * Math.sin(ha)];
+  const arm = (b, s) => { const [j, e] = limbPts(b, s, LEN.UA, LEN.FA); return [b, j, e]; };
+  const leg = (b, s) => { const [j, e] = limbPts(b, s, LEN.TH, LEN.SH); return [b, j, e]; };
+  const mid = [(hip[0] + sh[0]) / 2, (hip[1] + sh[1]) / 2];
+  const ctrl = [mid[0] - perp[0] * f.arch * 2, mid[1] - perp[1] * f.arch * 2];
+  return { hip, sh, hipN, hipF, shN, shF, head, ctrl,
+    AN: arm(shN, f.aN), AF: arm(shF, f.aF), LN: leg(hipN, f.lN), LF: leg(hipF, f.lF) };
+}
+
+// 依動作範圍自動縮放鏡頭
+function fitBox(ex) {
+  if (ex._vb) return ex._vb;
+  if (!ex._frames) ex._frames = ex.frames.map(normFrame);
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  const rot = ex.view === 'top' ? p => [250 - p[1], p[0] - 50] : p => p;
+  const add = (q, r = 4) => { const p = rot(q); x0 = Math.min(x0, p[0] - r); y0 = Math.min(y0, p[1] - r); x1 = Math.max(x1, p[0] + r); y1 = Math.max(y1, p[1] + r); };
+  const samples = [];
+  const total = cycleLen(ex) * 1;
+  for (let i = 0; i < 24; i++) samples.push(poseAt(ex, (total * i) / 24));
+  samples.forEach(f => {
+    const k = skeleton(ex, f);
+    [k.hip, k.sh, ...k.AN, ...k.AF, ...k.LN, ...k.LF].forEach(p => add(p));
+    add(k.head, LEN.HR + 3);
+  });
+  const pr = ex.props || {};
+  if (pr.bed) { add([pr.bed[0], pr.bed[1]], 0); add([pr.bed[0] + Math.min(pr.bed[2], 90), 171], 0); }
+  if (pr.pillow) { add([pr.pillow[0] - pr.pillow[2], pr.pillow[1] - pr.pillow[3]], 0); add([pr.pillow[0] + pr.pillow[2], pr.pillow[1]], 0); }
+  if (ex.view !== 'top') y1 = Math.max(y1, 176);
+  const pad = 16, AR = 300 / 210;
+  x0 -= pad; x1 += pad; y0 -= pad; y1 += 6;
+  let w = x1 - x0, h = y1 - y0;
+  if (w / h < AR) { const nw = h * AR; x0 -= (nw - w) / 2; w = nw; }
+  else { const nh = w / AR; y0 -= nh - h; h = nh; }
+  return (ex._vb = [x0, y0, w, h]);
+}
+
+function renderPose(ex, f) {
+  const side = ex.view === 'side' || !ex.view;
+  const k = skeleton(ex, f);
+  const vb = fitBox(ex);
+  const pr = ex.props || {};
+  const farCls = side ? 'fig far' : 'fig';
+  let s = '';
+  if (ex.view === 'top') s += `<g transform="rotate(90 150 100)"><rect x="100" y="-40" width="100" height="240" rx="8" class="mat"/>`;
+  else s += `<line x1="${(vb[0] - 5).toFixed(0)}" y1="171" x2="${(vb[0] + vb[2] + 5).toFixed(0)}" y2="171" class="floor"/>`;
+  if (pr.wall) s += `<rect x="92" y="-18" width="116" height="189" rx="2" class="wall"/>`;
+  if (pr.bed) s += `<rect x="${pr.bed[0]}" y="${pr.bed[1]}" width="${pr.bed[2]}" height="${171 - pr.bed[1]}" rx="5" class="prop"/>`;
+  if (pr.pillow) s += `<ellipse cx="${pr.pillow[0]}" cy="${pr.pillow[1]}" rx="${pr.pillow[2]}" ry="${pr.pillow[3]}" class="prop"/>`;
+  if (f.glow > 0.01) s += `<circle cx="${k.hip[0]}" cy="${k.hip[1]}" r="${(10 + 8 * f.glow).toFixed(1)}" class="glow" opacity="${(0.25 + 0.55 * f.glow).toFixed(2)}"/>`;
+  s += pl(k.LF, farCls, 7) + pl(k.AF, farCls, 6.5);
+  s += `<path d="M${P(k.hip)} Q${P(k.ctrl)} ${P(k.sh)}" class="fig" stroke-width="10"/>`;
+  if (f.sw > 0) s += pl([k.shF, k.sh, k.shN], 'fig', 8);
+  if (f.hw > 0) s += pl([k.hipF, k.hip, k.hipN], 'fig', 9);
+  s += `<circle cx="${k.head[0].toFixed(1)}" cy="${k.head[1].toFixed(1)}" r="${LEN.HR}" class="head"/>`;
+  s += pl(k.LN, 'fig', 7) + pl(k.AN, 'fig', 6.5);
+  if (pr.band === 'hands') s += pl([k.AN[2], k.AF[2]], 'band', 2.5);
+  if (pr.band === 'feet') s += pl([k.AN[2], k.LN[2]], 'band', 2.5) + pl([k.AF[2], k.LF[2]], 'band', 2);
+  (pr.db || []).forEach(n => {
+    const h = n === 'n' ? k.AN[2] : k.AF[2];
+    s += `<circle cx="${h[0].toFixed(1)}" cy="${h[1].toFixed(1)}" r="6" class="db"/>`;
+  });
+  if (ex.view === 'top') s += '</g>';
+  return s;
+}
+
+// ---------- 基本姿勢 ----------
+const ARMS_SIDE = { aN: { a: [176, 180] }, aF: { a: [178, 180] } };
+const SUP = { p: [140, 160], t: 0, hd: 0, ...ARMS_SIDE };
+const TABLE = { lN: { a: [270, 180] }, lF: { a: [272, 182] } };
+const QUAD = { p: [118, 128], t: -10, hd: 25, aN: { a: [90, 90] }, aF: { a: [92, 90] }, lN: { a: [90, 180] }, lF: { a: [92, 180] } };
+const PRONE = { p: [130, 158], t: 0, hd: -12, aN: { a: [22, -172] }, aF: { a: [26, -168] }, lN: { a: [180, 180] }, lF: { a: [181, 181] } };
+const STAND = { p: [150, 90], t: -90, hd: 0, sw: 34, hw: 18, lN: { a: [88, 90] }, lF: { a: [92, 90] }, aN: { a: [88, 90] }, aF: { a: [92, 90] } };
+const TOPSUP = { p: [150, 112], t: -90, hd: 0, sw: 34, hw: 20, aN: { a: [95, 92] }, aF: { a: [85, 88] } };
+
+const circleFrames = (() => {
+  const out = [];
+  for (let i = 0; i < 8; i++) {
+    const th = (i / 8) * Math.PI * 2;
+    const a = 186 + 9 * Math.sin(th), s = 1 + 0.07 * Math.cos(th);
+    out.push({ ...QUAD, lN: { a: [a, a], s: [s, s] } });
+  }
+  return out;
+})();
+
+// dose: [第1–2週, 第3–4週, 第5週起]
+const EX = {
+  catcow: {
+    pose: '四足跪姿', brief: ['吸氣：塌腰、抬頭', '吐氣：拱背、收下巴', '跟著呼吸慢慢交替'],
+    name: '貓牛式', tags: ['伸展', '骨盆前傾'], kind: 'reps', reps: [10, 10, 12], sets: [1, 1, 1], rpc: 1,
+    frames: [{ ...QUAD, arch: -8, hd: -20 }, { ...QUAD, arch: 11, hd: 60 }], dur: [2200, 2200],
+    cue: '吸氣塌腰抬頭，吐氣拱背收下巴',
+    steps: ['四足跪姿：手在肩膀正下方，膝蓋在髖部正下方。', '吸氣，肚子往下沉、胸口往前推、視線往前上方。', '吐氣，背往上拱成圓弧，下巴收向胸口，尾椎往下捲。', '跟著呼吸慢慢做，一節一節活動脊椎。'],
+    tips: ['動作慢，不要甩腰。', '久坐後先做這個，讓腰背暖起來。']
+  },
+  hipflex: {
+    pose: '床邊俯趴，一腳放床上、一腳往後伸', brief: ['前腳彎曲放床上，後腳伸直點地', '收肚子、夾臀，骨盆往床面壓', '感覺後腿髖部前側拉開，自然呼吸'],
+    name: '床邊弓步髖屈肌伸展', src: 'ZZ練瑜伽', tags: ['骨盆前傾', '伸展'], kind: 'hold', secs: [60, 60, 90], sets: [1, 1, 1], side: true,
+    props: { bed: [164, 122, 136] },
+    frames: [
+      { p: [172, 112], t: 0, hd: -15, aN: { a: [20, -10] }, aF: { a: [26, -14] }, lN: { a: [14, 182] }, lF: { a: [136, 136] } },
+      { p: [172, 115], t: 1, hd: -15, aN: { a: [18, -10] }, aF: { a: [24, -14] }, lN: { a: [14, 182] }, lF: { a: [134, 134] } }
+    ], dur: [2600, 2600],
+    cue: '後腿大腿前側到髖部有拉扯感',
+    steps: ['趴在床邊，一腳彎曲放在床上，另一腳往後伸直、腳尖點地。', '肚子微收、臀部輕輕夾緊，骨盆往床面方向下壓。', '感覺後腿的大腿前側和髖部前方被拉開，自然呼吸。', '時間到換邊。'],
+    tips: ['這是改善骨盆前傾最關鍵的伸展：久坐會讓髖屈肌變短，把骨盆往前拉。', '不要塌腰，拉伸感應該在髖部前側，不是下背。']
+  },
+  wiper: {
+    pose: '仰躺屈膝，雙腳踩地', brief: ['雙腳比肩寬，肩膀貼地', '雙膝一起倒向一側', '回到中間，再倒向另一側'],
+    name: '仰躺雙腿左右擺動', src: 'ZZ練瑜伽', tags: ['伸展', '腹部'], kind: 'reps', reps: [12, 16, 16], sets: [1, 1, 1], rpc: 2, view: 'top',
+    frames: [
+      { ...TOPSUP, lN: { a: [80.5, 84.8], s: [0.455, 0.55] }, lF: { a: [99.5, 95.2], s: [0.455, 0.55] } },
+      { ...TOPSUP, lN: { a: [20.4, 138], s: [0.93, 1.0] }, lF: { a: [29.7, 153.4], s: [1.0, 1.1] } },
+      { ...TOPSUP, lN: { a: [80.5, 84.8], s: [0.455, 0.55] }, lF: { a: [99.5, 95.2], s: [0.455, 0.55] } },
+      { ...TOPSUP, lN: { a: [150.3, 26.6], s: [1.0, 1.1] }, lF: { a: [159.6, 42], s: [0.93, 1.0] } }
+    ], dur: [1700, 1700, 1700, 1700],
+    cue: '俯視圖：膝蓋一起倒向左、再倒向右',
+    steps: ['仰躺，雙膝彎曲，雙腳踩地、比肩膀寬一點。', '雙手放身體兩側，肩膀貼地。', '雙膝一起慢慢倒向一側，再回到中間、倒向另一側。', '左右算各一下。'],
+    tips: ['肩膀不要離地，轉動發生在腰和髖。', '放鬆地擺動就好，不用刻意壓到底。']
+  },
+
+  // ---- A 臀部 ----
+  bridge: {
+    pose: '仰躺屈膝，雙腳踩地', brief: ['腳跟離臀部一個手掌，下背先貼地', '夾臀把髖往上推，頂端停 1 秒', '一節一節慢慢放下'],
+    name: '臀橋', src: '金小胖 Yoga', tags: ['臀部', '骨盆前傾'], kind: 'reps', reps: [12, 15, 16], sets: [3, 3, 3], rpc: 1,
+    frames: [
+      { ...SUP, lN: { t: [95, 166] }, lF: { t: [99, 166] } },
+      { ...SUP, p: [146.8, 133.3], t: 28.4, hd: -28.4, lN: { t: [95, 166] }, lF: { t: [99, 166] } },
+      { ...SUP, p: [146.8, 133.3], t: 28.4, hd: -28.4, lN: { t: [95, 166] }, lF: { t: [99, 166] } }
+    ], dur: [1200, 700, 1300],
+    cue: '臀部夾緊往上推，頂端停一下',
+    steps: ['仰躺，膝蓋彎曲，雙腳踩地與髖同寬，腳跟離臀部約一個手掌。', '先把下背輕輕壓向地面（骨盆微微後傾），再夾緊臀部把髖往上推。', '推到肩膀、髖、膝蓋成一直線，頂端停 1 秒。', '一節一節慢慢放下。'],
+    tips: ['頂端不要過度挺腰，用臀部出力，不是腰。', '感覺大腿後側比臀部痠的話，腳往臀部靠近一點。']
+  },
+  heelbridge: {
+    pose: '仰躺，腳跟併攏、膝蓋向外', brief: ['腳跟併攏，膝蓋打開成菱形', '夾臀把髖往上推，停 1 秒', '慢慢放下'],
+    name: '併攏腳跟臀橋', src: '金小胖 Yoga', tags: ['臀部'], kind: 'reps', reps: [12, 15, 16], sets: [3, 3, 3], rpc: 1,
+    frames: [
+      { ...SUP, lN: { t: [104, 166] }, lF: { t: [106, 166] } },
+      { ...SUP, p: [146.8, 133.3], t: 28.4, hd: -28.4, lN: { t: [104, 166] }, lF: { t: [106, 166] } },
+      { ...SUP, p: [146.8, 133.3], t: 28.4, hd: -28.4, lN: { t: [104, 166] }, lF: { t: [106, 166] } }
+    ], dur: [1200, 700, 1300],
+    cue: '腳跟併攏、膝蓋朝外打開',
+    steps: ['仰躺，兩腳腳跟併攏、腳尖朝外，膝蓋向兩側打開成菱形。', '臀部夾緊，把髖往上推。', '頂端停 1 秒，感覺臀部外側收緊。', '慢慢放下。'],
+    tips: ['膝蓋保持向外，不要往內倒。', '這個角度更容易練到臀部外上方，幫助臀型更飽滿。']
+  },
+  bridgeopen: {
+    pose: '仰躺，撐在臀橋頂端', brief: ['先推到臀橋頂端並撐住', '膝蓋往兩側打開', '合回來，臀部全程不掉下'],
+    name: '靜態臀橋開合', src: '金小胖 Yoga', tags: ['臀部'], kind: 'reps', reps: [12, 15, 16], sets: [2, 3, 3], rpc: 1, view: 'top',
+    frames: [
+      { ...TOPSUP, lN: { a: [90, 90], s: [0.5, 0.55] }, lF: { a: [90, 90], s: [0.5, 0.55] } },
+      { ...TOPSUP, lN: { a: [40, 145.6], s: [0.9, 0.84] }, lF: { a: [140, 34.4], s: [0.9, 0.84] } }
+    ], dur: [1400, 1400],
+    cue: '俯視圖：臀部撐在高處，膝蓋開、合',
+    steps: ['先做好臀橋，把臀部推到頂端並保持住。', '臀部不要掉下來，膝蓋往兩側打開。', '再慢慢合回來，這樣算一下。', '做完才把臀部放下。'],
+    tips: ['全程臀部維持在高處，是這個動作的重點。', '可以在膝蓋上方套彈力帶增加強度（第 3 週後）。']
+  },
+  donkey: {
+    pose: '四足跪姿', brief: ['膝蓋保持彎曲 90 度', '腳底往天花板推，到大腿水平', '慢慢放下，膝蓋不碰地'],
+    name: '四足屈膝後踢', src: '靜益求精', tags: ['臀部'], kind: 'reps', reps: [12, 15, 15], sets: [2, 2, 2], rpc: 1, side: true,
+    frames: [QUAD, { ...QUAD, lN: { a: [180, 270] } }, { ...QUAD, lN: { a: [180, 270] } }], dur: [1100, 400, 1300],
+    cue: '膝蓋保持 90 度，腳底往天花板推',
+    steps: ['四足跪姿，肚子微收，背部保持平。', '一腳膝蓋維持彎曲 90 度，用臀部把腳底往天花板推。', '推到大腿與地面平行，停一下。', '慢慢放回，膝蓋不碰地接著下一下。'],
+    tips: ['不要為了抬高而塌腰，抬到大腿水平就夠了。', '骨盆保持正對地面，不要往側邊翻。']
+  },
+  kickback: {
+    pose: '四足跪姿，一腳往後伸直', brief: ['腿伸直，腳尖輕點地', '用臀部把腿往後上方抬', '慢慢放下再抬，腰不下凹'],
+    name: '四足直腿後踢', src: '靜益求精', tags: ['臀部'], kind: 'reps', reps: [12, 15, 16], sets: [2, 2, 2], rpc: 1, side: true,
+    frames: [{ ...QUAD, lN: { a: [165, 172] } }, { ...QUAD, lN: { a: [195, 195] } }, { ...QUAD, lN: { a: [195, 195] } }], dur: [1100, 300, 1300],
+    cue: '腿伸直往後上方抬，臀部出力',
+    steps: ['四足跪姿，一腳往後伸直，腳尖輕點地。', '用臀部把整條腿往後上方抬起。', '抬到比身體略高就好，停一下。', '慢慢放下，腳尖輕碰地再抬。'],
+    tips: ['腰不要跟著往下凹，肚子一直收著。', '動作慢比抬很高更有效。']
+  },
+  hydrant: {
+    pose: '四足跪姿', brief: ['膝蓋往側邊抬到髖部高度', '在這個高度把腿往後踢直', '收回側抬，再放下'],
+    name: '側抬腿後踢', src: '靜益求精', tags: ['臀部'], kind: 'reps', reps: [10, 12, 12], sets: [2, 2, 2], rpc: 1, side: true,
+    frames: [QUAD, { ...QUAD, lN: { a: [90, 180], s: [0.35, 1] } }, { ...QUAD, lN: { a: [190, 190] } }, { ...QUAD, lN: { a: [90, 180], s: [0.35, 1] } }],
+    dur: [1000, 900, 1000, 1000],
+    cue: '膝蓋先往側邊抬，再往後踢直',
+    steps: ['四足跪姿，一腳膝蓋彎曲往側邊抬起（像小狗抬腳），抬到與髖同高。', '在這個高度把腿往後踢直。', '收回到側抬的位置。', '放下，這樣算一下。'],
+    tips: ['身體不要跟著往另一邊倒。', '這個動作練臀部側邊，能讓臀型更圓。']
+  },
+  circles: {
+    pose: '四足跪姿，一腳往後伸直抬高', brief: ['腿抬到與身體同高', '腳尖在空中畫小圓', '做到一半次數時換反方向'],
+    name: '四足抬腿畫圈', src: '靜益求精', tags: ['臀部'], kind: 'reps', reps: [8, 10, 12], sets: [1, 1, 1], rpc: 1, side: true, ease: 'linear',
+    frames: circleFrames, dur: Array(8).fill(320),
+    cue: '腿伸直，腳尖畫小圓',
+    steps: ['四足跪姿，一腳往後伸直、抬到與身體同高。', '用腳尖在空中畫一個小圓。', '做完順時針次數後，換逆時針。', '換邊重複。'],
+    tips: ['圓畫小一點，控制比幅度重要。', '腰背保持穩定不晃動。']
+  },
+
+  // ---- B 腹部 ----
+  deadbug: {
+    pose: '仰躺，雙手朝天，雙腿抬起屈膝 90 度', brief: ['下背壓地、肚子收緊', '對側的手和腳慢慢伸遠，不碰地', '收回，換另一組手腳'],
+    name: '死蟲式', tags: ['腹部', '骨盆前傾'], kind: 'reps', reps: [10, 12, 14], sets: [3, 3, 3], rpc: 2,
+    frames: [
+      { ...SUP, ...TABLE, aN: { a: [270, 270] }, aF: { a: [268, 268] } },
+      { ...SUP, ...TABLE, lN: { a: [185, 185] }, aN: { a: [270, 270] }, aF: { a: [345, 345] } },
+      { ...SUP, ...TABLE, aN: { a: [270, 270] }, aF: { a: [268, 268] } },
+      { ...SUP, ...TABLE, lF: { a: [186, 186] }, aN: { a: [345, 345] }, aF: { a: [268, 268] } }
+    ], dur: [1600, 1600, 1600, 1600],
+    cue: '下背全程貼地，對側手腳慢慢伸遠',
+    steps: ['仰躺，雙手朝天花板伸直，雙腿抬起膝蓋彎曲 90 度。', '吐氣把下背壓向地面，肚子收緊。', '一手往頭頂方向、對側腳往前方慢慢伸遠，不碰地。', '收回，換另一組手腳。'],
+    tips: ['下背一離地就是伸太遠了，縮小幅度。', '這是練腹部線條、同時改善骨盆前傾最安全的動作之一。']
+  },
+  toetap: {
+    pose: '仰躺，雙腿抬起屈膝 90 度', brief: ['下背壓地、肚子收緊', '膝蓋角度不變，一腳腳尖點地', '收回，換另一腳'],
+    name: '仰躺雙腿腳尖點地', src: '金小胖 Yoga', tags: ['腹部'], kind: 'reps', reps: [12, 16, 16], sets: [3, 3, 3], rpc: 2,
+    frames: [
+      { ...SUP, ...TABLE },
+      { ...SUP, ...TABLE, lN: { a: [215, 125] } },
+      { ...SUP, ...TABLE },
+      { ...SUP, ...TABLE, lF: { a: [217, 127] } }
+    ], dur: [1400, 1400, 1400, 1400],
+    cue: '膝蓋角度不變，輪流用腳尖點地',
+    steps: ['仰躺，雙腿抬起，膝蓋彎曲 90 度（小腿與地面平行）。', '下背壓地、肚子收緊。', '保持膝蓋角度，一腳慢慢往下，用腳尖輕點地面。', '收回，換另一腳。'],
+    tips: ['下背拱起來就是核心沒撐住，先減少次數。', '熟練後可以兩腳一起點地。']
+  },
+  birddog: {
+    pose: '四足跪姿', brief: ['對側的手和腳同時伸直', '手、背、腳成一直線，停 2 秒', '收回，換另一組'],
+    name: '鳥狗式', tags: ['腹部', '骨盆前傾'], kind: 'reps', reps: [8, 10, 12], sets: [3, 3, 3], rpc: 2,
+    frames: [
+      QUAD,
+      { ...QUAD, aN: { a: [-8, -8] }, lF: { a: [188, 188] } },
+      { ...QUAD, aN: { a: [-8, -8] }, lF: { a: [188, 188] } },
+      QUAD,
+      { ...QUAD, aF: { a: [-8, -8] }, lN: { a: [188, 188] } },
+      { ...QUAD, aF: { a: [-8, -8] }, lN: { a: [188, 188] } }
+    ], dur: [1300, 700, 1300, 1300, 700, 1300],
+    cue: '對側手腳伸直，身體像桌面一樣穩',
+    steps: ['四足跪姿，肚子微收，背部平。', '一手往前、對側腳往後同時伸直。', '手、背、腳成一直線，停 2 秒。', '收回，換另一組。'],
+    tips: ['想像背上放了一杯水，不要讓它翻倒。', '腳抬到與身體同高就好，不要抬過頭造成塌腰。']
+  },
+  revcrunch: {
+    pose: '仰躺，雙腿抬起屈膝 90 度', brief: ['雙手放身體兩側', '吐氣，用下腹把骨盆往胸口捲', '慢慢放回，不要甩腿'],
+    name: '反向捲腹', tags: ['腹部'], kind: 'reps', reps: [10, 12, 15], sets: [3, 3, 3], rpc: 1,
+    frames: [
+      { ...SUP, ...TABLE },
+      { ...SUP, p: [141.2, 148.4], t: 12, hd: -12, lN: { a: [305, 215] }, lF: { a: [307, 217] } },
+      { ...SUP, p: [141.2, 148.4], t: 12, hd: -12, lN: { a: [305, 215] }, lF: { a: [307, 217] } }
+    ], dur: [1300, 400, 1500],
+    cue: '用下腹把骨盆捲起來，不是甩腿',
+    steps: ['仰躺，雙腿抬起膝蓋彎曲 90 度，雙手放身體兩側。', '吐氣，用下腹的力量把骨盆往胸口方向捲起，臀部稍微離地。', '停一下，感覺下腹收緊。', '慢慢把骨盆放回，不要用甩的。'],
+    tips: ['幅度不用大，臀部離地一點點就夠。', '特別針對下腹，小腹凸出的人很適合。']
+  },
+  plank: {
+    pose: '前臂撐地，腳尖撐地', brief: ['手肘在肩膀正下方', '頭到腳跟成一直線', '收腹、夾臀，自然呼吸'],
+    name: '平板支撐', tags: ['腹部'], kind: 'hold', secs: [20, 30, 40], sets: [3, 3, 3],
+    frames: [
+      { p: [135.5, 148], t: -13.4, hd: 13, aN: { a: [90, 0] }, aF: { a: [92, 2] }, lN: { a: [166.6, 166.6] }, lF: { a: [167, 167] } },
+      { p: [135.5, 146.8], t: -12.4, hd: 13, aN: { a: [89, 0] }, aF: { a: [91, 2] }, lN: { a: [167.4, 167.4] }, lF: { a: [167.8, 167.8] } }
+    ], dur: [2400, 2400],
+    cue: '頭到腳跟一直線，肚子收、臀部夾',
+    steps: ['手肘在肩膀正下方，前臂貼地。', '腳尖撐地，身體從頭到腳跟成一直線。', '肚子收緊、臀部輕夾，骨盆微微往後捲。', '自然呼吸，不要憋氣。'],
+    tips: ['腰往下掉或臀部翹太高都要調整。', '撐不住可以先改成膝蓋跪地的版本。']
+  },
+  kegel: {
+    pose: '跪姿，雙手扶腰臀', brief: ['臀部往後坐向腳跟', '夾臀把髖推回直立跪姿', '頂端收縮骨盆底 1 秒，再放鬆'],
+    name: '跪姿凱格爾', src: '金小胖 Yoga', tags: ['骨盆底', '臀部'], kind: 'reps', reps: [15, 20, 25], sets: [2, 2, 2], rpc: 1,
+    frames: [
+      { p: [150, 128], t: -90, hd: 0, lN: { t: [110, 168], b: -1 }, lF: { t: [112, 168], b: -1 }, aN: { t: [145, 117], b: 1 }, aF: { t: [148, 117], b: 1 }, glow: 1 },
+      { p: [150, 128], t: -90, hd: 0, lN: { t: [110, 168], b: -1 }, lF: { t: [112, 168], b: -1 }, aN: { t: [145, 117], b: 1 }, aF: { t: [148, 117], b: 1 }, glow: 1 },
+      { p: [116, 145], t: -72, hd: 5, lN: { t: [110, 168], b: -1 }, lF: { t: [112, 168], b: -1 }, aN: { t: [120, 134], b: 1 }, aF: { t: [123, 134], b: 1 }, glow: 0 },
+      { p: [116, 145], t: -72, hd: 5, lN: { t: [110, 168], b: -1 }, lF: { t: [112, 168], b: -1 }, aN: { t: [120, 134], b: 1 }, aF: { t: [123, 134], b: 1 }, glow: 0 }
+    ], dur: [1200, 1000, 300, 1000],
+    cue: '往後坐向腳跟，起身時夾臀、收縮骨盆底（亮起時）',
+    steps: ['跪姿，膝蓋與髖同寬，腳背貼地，雙手扶在腰臀兩側。', '臀部往後坐向腳跟，上身微微前傾，背保持直。', '用臀部把髖往前推回直立跪姿，同時收縮骨盆底肌（像憋尿、把會陰往上提）並夾緊臀部，停 1 秒。', '放鬆，再往後坐。'],
+    tips: ['起身到頂端時不要挺腰往後仰，是用臀部把骨盆推正。', '膝蓋不舒服可以把瑜伽墊對折，或墊條毛巾。', '往下坐時記得完全放鬆骨盆底，放鬆和收縮一樣重要。']
+  },
+
+  // ---- C 上背 + 背後側 ----
+  extrot: {
+    pose: '站姿，雙手握彈力帶', brief: ['手肘彎 90 度，夾在腰側', '前臂往外轉開，拉開彈力帶', '停一下，慢慢收回'],
+    name: '手肘夾腰外旋', src: 'Maggie美學生活', tags: ['圓肩'], kind: 'reps', reps: [12, 15, 15], sets: [3, 3, 3], rpc: 1, view: 'front',
+    props: { band: 'hands' },
+    frames: [
+      { ...STAND, aN: { a: [90, 90], s: [1, 0.25] }, aF: { a: [90, 90], s: [1, 0.25] } },
+      { ...STAND, aN: { a: [90, 0] }, aF: { a: [90, 180] } },
+      { ...STAND, aN: { a: [90, 0] }, aF: { a: [90, 180] } }
+    ], dur: [1300, 400, 1400],
+    cue: '手肘夾緊腰側，只有前臂往外轉開',
+    steps: ['站直，雙手握住彈力帶兩端，手肘彎曲 90 度，夾在腰側。', '肩膀往後下沉，胸口微微打開。', '手肘不離開腰，前臂往外轉開，拉開彈力帶。', '停一下，再慢慢收回。'],
+    tips: ['原影片用雙啞鈴。你只有一個啞鈴，用彈力帶反而更好：站著拿啞鈴做這個動作時，重力方向幾乎沒有阻力。', '不要聳肩，感覺出力在肩膀後側和肩胛骨之間。']
+  },
+  rearraise: {
+    pose: '站姿上身前傾，單手拿啞鈴', brief: ['膝蓋微彎，背部打平', '手臂伸直往後上方舉', '夾緊肩胛骨停一下，慢慢放下'],
+    name: '俯身單手後舉', src: 'Maggie美學生活', tags: ['圓肩'], kind: 'reps', reps: [10, 12, 15], sets: [2, 3, 3], rpc: 1, side: true,
+    props: { db: ['n'] },
+    frames: [
+      { p: [138, 92], t: -38, hd: 40, lN: { t: [152, 169], b: -1 }, lF: { t: [142, 169], b: -1 }, aN: { a: [95, 95] }, aF: { a: [110, 70] } },
+      { p: [138, 92], t: -38, hd: 40, lN: { t: [152, 169], b: -1 }, lF: { t: [142, 169], b: -1 }, aN: { a: [163, 163] }, aF: { a: [110, 70] } },
+      { p: [138, 92], t: -38, hd: 40, lN: { t: [152, 169], b: -1 }, lF: { t: [142, 169], b: -1 }, aN: { a: [163, 163] }, aF: { a: [110, 70] } }
+    ], dur: [1200, 400, 1400],
+    cue: '手臂伸直往後上方舉，夾緊肩胛骨',
+    steps: ['雙腳與髖同寬，膝蓋微彎，上身從髖部前傾，背部保持平。', '一手拿啞鈴自然垂下，另一手扶在大腿上。', '手臂伸直，往身體後上方舉起，同時把肩胛骨往中間夾。', '停一下，慢慢放回。'],
+    tips: ['背不要拱起來，脖子跟背部保持同一直線。', '用肩膀後側和上背出力，不是甩手。']
+  },
+  bandrow: {
+    pose: '坐姿，雙腿伸直，彈力帶繞過腳底', brief: ['坐直，肩膀往下沉', '手肘貼著身體往後拉', '夾緊肩胛骨停一下，慢慢放回'],
+    name: '彈力帶坐姿划船', tags: ['圓肩'], kind: 'reps', reps: [12, 15, 15], sets: [3, 3, 3], rpc: 1,
+    props: { band: 'feet' },
+    frames: [
+      { p: [110, 160], t: -84, hd: 5, lN: { a: [2, 2] }, lF: { a: [1, 1] }, aN: { a: [25, 20] }, aF: { a: [27, 22] } },
+      { p: [110, 160], t: -86, hd: 3, lN: { a: [2, 2] }, lF: { a: [1, 1] }, aN: { a: [150, 5] }, aF: { a: [152, 7] } },
+      { p: [110, 160], t: -86, hd: 3, lN: { a: [2, 2] }, lF: { a: [1, 1] }, aN: { a: [150, 5] }, aF: { a: [152, 7] } }
+    ], dur: [1200, 400, 1400],
+    cue: '手肘往後拉，肩胛骨往中間夾',
+    steps: ['坐在地上雙腿伸直，彈力帶繞過腳底，雙手握住兩端。', '坐直，肩膀往下沉。', '手肘貼著身體往後拉，把肩胛骨往中間夾。', '停一下，慢慢放回。'],
+    tips: ['身體不要往後倒來借力。', '坐不直的話可以膝蓋微彎。']
+  },
+  wallangel: {
+    pose: '靠牆站', brief: ['臀部、上背、後腦勺貼牆', '手臂抬成 W，貼著牆', '往上滑成 Y，再滑回 W'],
+    name: '靠牆天使', tags: ['圓肩'], kind: 'reps', reps: [8, 10, 10], sets: [3, 3, 3], rpc: 1, view: 'front',
+    props: { wall: true },
+    frames: [
+      { ...STAND, aN: { a: [20, -80] }, aF: { a: [160, 260] } },
+      { ...STAND, aN: { a: [-55, -62] }, aF: { a: [235, 242] } }
+    ], dur: [2000, 2000],
+    cue: '背和手臂貼牆，從 W 滑到 Y',
+    steps: ['背靠牆站，腳跟離牆約一個腳掌，臀部、上背、後腦勺貼牆。', '手臂抬起成 W 形，手肘和手背盡量貼牆。', '手臂沿著牆慢慢往上滑成 Y 形。', '再滑回 W。'],
+    tips: ['下背不要離牆太多，肚子微收。', '手背貼不到牆很正常，圓肩越明顯越難，做得到的範圍就好。']
+  },
+  pronelift: {
+    pose: '趴姿，雙手墊額頭', brief: ['恥骨壓地、肚子微收', '夾臀把雙腿抬離地面', '停一下，慢慢放下'],
+    name: '俯臥雙腳上抬', src: '靜益求精', tags: ['臀部'], kind: 'reps', reps: [10, 12, 12], sets: [3, 3, 3], rpc: 1,
+    frames: [PRONE, { ...PRONE, lN: { a: [193, 193] }, lF: { a: [194, 194] } }, { ...PRONE, lN: { a: [193, 193] }, lF: { a: [194, 194] } }],
+    dur: [1200, 500, 1300],
+    cue: '恥骨壓地，用臀部把雙腿抬離地',
+    steps: ['趴著，雙手交疊墊在額頭下。', '恥骨壓向地面、肚子微收。', '夾緊臀部，把雙腿一起抬離地面幾公分。', '停一下，慢慢放下。'],
+    tips: ['骨盆前傾的人最容易用腰代償：抬低一點沒關係，腰不能痠。', '腰痠就先停，改做臀橋。']
+  },
+  vlift: {
+    pose: '趴姿，雙腿打開成 V 字', brief: ['腳尖朝外，恥骨壓地', '夾臀把雙腿抬起', '停一下，慢慢放下'],
+    name: 'V 型雙腳上抬', src: '靜益求精', tags: ['臀部'], kind: 'reps', reps: [10, 12, 12], sets: [2, 3, 3], rpc: 1,
+    frames: [
+      { ...PRONE, lN: { a: [180, 180] }, lF: { a: [183, 183] } },
+      { ...PRONE, lN: { a: [192, 192] }, lF: { a: [196, 196] } },
+      { ...PRONE, lN: { a: [192, 192] }, lF: { a: [196, 196] } }
+    ], dur: [1200, 500, 1300],
+    cue: '雙腿打開成 V 字，腳尖朝外再抬起',
+    steps: ['趴著，雙腿打開比肩寬成 V 字，腳尖朝外。', '恥骨壓地、肚子微收。', '夾緊臀部把雙腿抬起。', '停一下，慢慢放下。'],
+    tips: ['腳尖朝外可以多練到臀部外側。', '同樣注意不要用腰。']
+  },
+  butterfly: {
+    pose: '趴姿，腳底相對、膝蓋打開', brief: ['恥骨壓地、肚子微收', '夾臀把膝蓋抬離地面', '停一下，慢慢放下'],
+    name: 'V 型蝴蝶式上抬', src: '靜益求精', tags: ['臀部'], kind: 'reps', reps: [10, 12, 12], sets: [2, 3, 3], rpc: 1,
+    frames: [
+      { ...PRONE, lN: { a: [180, 285] }, lF: { a: [182, 287] } },
+      { ...PRONE, lN: { a: [194, 290] }, lF: { a: [196, 292] } },
+      { ...PRONE, lN: { a: [194, 290] }, lF: { a: [196, 292] } }
+    ], dur: [1200, 500, 1300],
+    cue: '腳底相對，膝蓋離地往上抬',
+    steps: ['趴著，膝蓋彎曲向兩側打開，兩腳腳底貼在一起（像蝴蝶或青蛙）。', '恥骨壓地、肚子微收。', '夾緊臀部，把膝蓋抬離地面。', '停一下，慢慢放下。'],
+    tips: ['幅度很小是正常的，重點是臀部收緊的感覺。', '這個動作對扁臀特別有效。']
+  },
+
+  // ---- 收操 ----
+  pigeon: {
+    pose: '坐姿，一腳在前彎曲、一腳在後', brief: ['身體慢慢往前趴在枕頭上', '感覺前腳那側的臀部被拉開', '每次吐氣再放鬆一點'],
+    name: '趴枕鴿子式伸展', src: 'ZZ練瑜伽', tags: ['伸展', '臀部'], kind: 'hold', secs: [60, 90, 90], sets: [1, 1, 1], side: true,
+    props: { pillow: [206, 156, 36, 15] },
+    frames: [
+      { p: [126, 154], t: -27, hd: 22, lN: { a: [2, 172], s: [1, 0.6] }, lF: { a: [181, 181] }, aN: { a: [40, -5] }, aF: { a: [44, -3] } },
+      { p: [126, 155], t: -20, hd: 28, lN: { a: [2, 172], s: [1, 0.6] }, lF: { a: [181, 181] }, aN: { a: [30, -5] }, aF: { a: [34, -3] } }
+    ], dur: [3000, 3000],
+    cue: '身體趴向枕頭，吐氣時再放鬆一點',
+    steps: ['坐姿，一腳在身前彎曲，另一腳往後彎曲或伸直。', '身體慢慢往前趴，手和上身靠在枕頭上。', '感覺前腳那側的臀部被拉開。', '每次吐氣放鬆一點，時間到換邊。'],
+    tips: ['膝蓋有壓迫感就把前腳腳跟往身體收近一點。', '臀部緊繃會影響骨盆位置，睡前做很適合。']
+  }
+};
+
+
+// ---- 每日床邊伸展（頭懸在床緣）----
+const BEDP = { bed: [106, 122, 194] };
+const HANG = { p: [158, 114], t: 180, hd: -82, aN: { a: [6, 0] }, aF: { a: [8, 2] } };
+const KNEES = { lN: { t: [204, 118], b: -1 }, lF: { t: [206, 118], b: -1 } };
+const BED_SAFE = '有高血壓、青光眼或眼壓高、頸椎問題、懷孕或容易頭暈的人，先不要做頭部懸空的動作。';
+Object.assign(EX, {
+  bedhang: {
+    name: '床邊仰躺倒掛', src: '床邊伸展影片', tags: ['圓肩', '放鬆'], kind: 'hold', secs: [30, 45, 60], sets: [1, 1, 1], props: BEDP,
+    pose: '仰躺在床上，肩膀上緣對齊床邊，頭懸空', brief: ['肩膀上緣對齊床邊，頭慢慢往後放下', '手放身體兩側，胸口自然打開', '閉眼慢慢呼吸，頭暈就停'],
+    frames: [{ ...HANG, ...KNEES }, { ...HANG, ...KNEES, t: 182, hd: -86 }], dur: [2400, 2400], breath: ['in', 'out'],
+    cue: '胸口打開，跟著光圈慢慢呼吸',
+    steps: ['仰躺在床上，膝蓋彎曲雙腳踩床，往床邊挪到肩膀上緣剛好在床緣。', '一手托著後腦，慢慢把頭往後放下懸空，再放開手。', '雙手放在身體兩側，讓胸口自然打開，閉眼慢慢呼吸。', '結束時先用手托住頭，用腳把身體往床內推，讓頭回到床上，躺著休息一下再繼續。'],
+    tips: ['床緣要在肩膀上緣，不是脖子中間，脖子才不會被床邊頂住。', '頭暈、頭痛、眼睛脹或手麻就馬上停。', BED_SAFE, '起身時先翻到側躺，再用手撐坐起來，不要直接仰頭坐起。']
+  },
+  bedswing: {
+    name: '倒掛擺動手臂', src: '床邊伸展影片', tags: ['圓肩'], kind: 'reps', reps: [50, 80, 100], sets: [1, 1, 1], rpc: 2, unitNote: '下（往後、往前各算一下）', props: BEDP,
+    pose: '同倒掛姿勢，頭懸在床邊', brief: ['手臂伸直，從胸口上方往頭頂方向擺', '擺到床緣外側再回到胸口上方', '吸氣往後擺，吐氣往前擺'],
+    frames: [
+      { ...HANG, ...KNEES, aN: { a: [-90, -90] }, aF: { a: [-92, -92] } },
+      { ...HANG, ...KNEES, aN: { a: [-218, -218] }, aF: { a: [-213, -213] } }
+    ], dur: [1000, 1000], breath: ['in', 'out'],
+    cue: '手臂伸直往頭頂後方擺，打開胸口和腋下',
+    steps: ['維持倒掛姿勢，雙手往天花板伸直。', '手臂伸直，往頭頂方向擺到床緣外側，感覺胸口和腋下被拉開。', '再擺回胸口上方，往後和往前各算一下。', '速度平穩不用快，肩膀不舒服就縮小幅度。'],
+    tips: ['這個動作能拉開胸大肌和背闊肌，對圓肩含胸很有幫助。', '手臂擺到後面時不要讓腰跟著拱起來，肚子微收。', BED_SAFE]
+  },
+  bedbutterfly: {
+    name: '仰臥束腳', src: '床邊伸展影片', tags: ['伸展', '骨盆'], kind: 'hold', secs: [60, 90, 120], sets: [1, 1, 1], props: BEDP,
+    pose: '仰躺，腳底相對，膝蓋向兩側打開', brief: ['腳底貼在一起，靠近臀部', '膝蓋自然往兩側放下，不用硬壓', '雙手放肚子上，感覺腹部隨呼吸起伏'],
+    frames: [
+      { ...HANG, hd: -78, lN: { a: [-24, 54], s: [0.6, 0.43] }, lF: { a: [-20, 58], s: [0.58, 0.42] }, aN: { a: [10, -20] }, aF: { a: [12, -18] } },
+      { ...HANG, hd: -80, t: 181, lN: { a: [-18, 58], s: [0.62, 0.43] }, lF: { a: [-15, 60], s: [0.6, 0.42] }, aN: { a: [10, -26] }, aF: { a: [12, -24] } }
+    ], dur: [2600, 3000], breath: ['in', 'out'],
+    cue: '膝蓋放鬆往兩側，吸氣肚子鼓起、吐氣放鬆',
+    steps: ['仰躺，兩腳腳底貼在一起，腳跟靠近臀部。', '膝蓋自然往兩側放下，打開髖部和大腿內側。', '雙手放在肚子上，吸氣讓肚子鼓起，吐氣慢慢放鬆。', '覺得頭懸空太久不舒服，可以把頭放回床上做，效果一樣。'],
+    tips: ['膝蓋懸在半空很正常，不要用手壓，可以在膝蓋下各墊一個枕頭。', '大腿內側有拉扯感就好，不應該痛。', BED_SAFE]
+  },
+  bedhug: {
+    name: '躺著環抱雙腿', src: '床邊伸展影片', tags: ['放鬆', '骨盆前傾'], kind: 'hold', secs: [45, 60, 60], sets: [1, 1, 1], props: BEDP,
+    pose: '仰躺，雙手抱住雙膝靠近胸口', brief: ['雙膝抱向胸口，雙手環抱小腿', '下背和尾椎貼著床放鬆', '吐氣時膝蓋再靠近胸口一點'],
+    frames: [
+      { ...HANG, hd: -78, lN: { a: [-125, 25] }, lF: { a: [-122, 28] }, aN: { t: [146, 88] }, aF: { t: [149, 90] } },
+      { ...HANG, hd: -80, lN: { a: [-133, 18] }, lF: { a: [-130, 21] }, aN: { t: [140, 84] }, aF: { t: [143, 86] } }
+    ], dur: [2600, 3000], breath: ['in', 'out'],
+    cue: '吐氣時把膝蓋抱得更靠近胸口，下背放鬆',
+    steps: ['仰躺，雙膝彎曲抬起，雙手環抱小腿或膝蓋下方。', '把膝蓋抱向胸口，下背和尾椎貼著床放鬆。', '吸氣時稍微放鬆，吐氣時把膝蓋再拉近一點。', '做完先把腳放回床上，再用手托著頭，把身體往床內移，讓頭回到床上。'],
+    tips: ['這個動作能放鬆下背，骨盆前傾的人腰常緊，很適合當最後一個動作。', '起身時先翻到側躺，停幾秒再用手撐坐起來。', BED_SAFE]
+  }
+});
+const BEDSET = ['bedhang', 'bedswing', 'bedbutterfly', 'bedhug'];
+
+// 呼吸提示：對應每一段動畫（第 i 個畫面到下一個畫面），out＝吐氣、in＝吸氣
+const BREATH = {
+  catcow: ['out', 'in'], hipflex: ['out', 'in'], wiper: ['out', 'in', 'out', 'in'],
+  bridge: ['out', null, 'in'], heelbridge: ['out', null, 'in'], bridgeopen: ['out', 'in'],
+  donkey: ['out', null, 'in'], kickback: ['out', null, 'in'], hydrant: ['out', null, 'in', null],
+  circles: ['in', null, null, null, 'out', null, null, null],
+  deadbug: ['out', 'in', 'out', 'in'], toetap: ['out', 'in', 'out', 'in'],
+  birddog: ['out', null, 'in', 'out', null, 'in'], revcrunch: ['out', null, 'in'],
+  plank: ['in', 'out'], kegel: [null, 'in', null, 'out'],
+  extrot: ['out', null, 'in'], rearraise: ['out', null, 'in'], bandrow: ['out', null, 'in'],
+  wallangel: ['in', 'out'], pronelift: ['out', null, 'in'], vlift: ['out', null, 'in'], butterfly: ['out', null, 'in'],
+  pigeon: ['out', 'in']
+};
+for (const k in BREATH) EX[k].breath = BREATH[k];
+
+// 組間休息秒數：較吃力或需要腰背恢復的動作休息較久
+const REST_SEC = {
+  bridge: 40,
+  heelbridge: 40,
+  bridgeopen: 30,
+  donkey: 30,
+  kickback: 30,
+  hydrant: 30,
+  circles: 20,
+  deadbug: 30,
+  toetap: 30,
+  birddog: 30,
+  revcrunch: 40,
+  plank: 45,
+  kegel: 20,
+  extrot: 30,
+  rearraise: 30,
+  bandrow: 40,
+  wallangel: 30,
+  pronelift: 40,
+  vlift: 40,
+  butterfly: 40
+};
+for (const k in REST_SEC) EX[k].rest = REST_SEC[k];
+
+
+// 器材與地點：床、牆代表地點，其餘是器材
+const GEAR = {
+  catcow: ['瑜伽墊'], hipflex: ['床'], wiper: ['瑜伽墊'],
+  bridge: ['瑜伽墊'], heelbridge: ['瑜伽墊'], bridgeopen: ['瑜伽墊'], donkey: ['瑜伽墊'], kickback: ['瑜伽墊'], hydrant: ['瑜伽墊'], circles: ['瑜伽墊'],
+  deadbug: ['瑜伽墊'], toetap: ['瑜伽墊'], birddog: ['瑜伽墊'], revcrunch: ['瑜伽墊'], plank: ['瑜伽墊'], kegel: ['瑜伽墊'],
+  extrot: ['彈力帶'], rearraise: ['啞鈴'], bandrow: ['瑜伽墊', '彈力帶'], wallangel: ['牆'], pronelift: ['瑜伽墊'], vlift: ['瑜伽墊'], butterfly: ['瑜伽墊'],
+  pigeon: ['瑜伽墊', '枕頭'],
+  bedhang: ['床'], bedswing: ['床'], bedbutterfly: ['床'], bedhug: ['床']
+};
+for (const k in GEAR) EX[k].gear = GEAR[k];
+const PLACE_OF = { 床: '床邊', 牆: '靠牆' };
+function placeOf(ex) { const g = ex.gear || []; return g.includes('床') ? '床邊' : g.includes('牆') ? '牆邊' : g.includes('瑜伽墊') ? '瑜伽墊上' : '空地站著'; }
+const MOVE_SAY = { 床邊: '請移到床邊。', 牆邊: '請移到牆邊。', 瑜伽墊上: '請回到瑜伽墊上。', 空地站著: '請站起來，移到空地。' };
+function toolsOf(ex) { return (ex.gear || []).filter(g => !PLACE_OF[g]); }
+
+// 每日課表
+const ROUTINES = {
+  A: { name: '臀部日', focus: '臀部扁平、骨盆前傾', main: ['bridge', 'heelbridge', 'bridgeopen', 'donkey', 'kickback', 'hydrant', 'circles'] },
+  B: { name: '腹部日', focus: '腹部線條、骨盆底', main: ['deadbug', 'toetap', 'birddog', 'revcrunch', 'plank', 'bridge', 'kegel'] },
+  C: { name: '上背日', focus: '圓肩含胸、臀部後側', main: ['extrot', 'rearraise', 'bandrow', 'wallangel', 'pronelift', 'vlift', 'butterfly'] },
+  L: { name: '輕量腹部日', focus: '打球日，只做核心精簡版', main: ['deadbug', 'toetap', 'birddog', 'plank', 'kegel'] },
+  R: { name: '休息伸展日', focus: '只做伸展，讓身體恢復', main: [] }
+};
+const WARM = ['catcow', 'hipflex', 'wiper'];
+const COOL = ['pigeon'];
+// getDay(): 0=日
+const WEEK = { 1: 'A', 2: 'B', 3: 'C', 4: 'L', 5: 'A', 6: 'C', 0: 'R' };
+const DAYNAMES = ['日', '一', '二', '三', '四', '五', '六'];
+
+// ---------- 課表計算 ----------
+const REST = 30, SWITCH = 8;
+// 準備時間依語音長度調整：中文語音約每秒 4.5 字
+const speechSec = txt => txt.replace(/[，。、：；（）\s]/g, '').length / 4.5;
+function prepText(ex) { return `下一個動作，${ex.name}。${ex.steps.join('')}`; }
+function prepDur(ex) { return Math.max(10, Math.ceil(speechSec(prepText(ex)) + 4)); }
+const LEVELS = ['第 1–2 週', '第 3–4 週', '第 5 週起'];
+
+function repSec(ex) { return cycleLen(ex) / (ex.rpc || 1) / 1000; }
+function workSec(ex, lv) { return ex.kind === 'hold' ? ex.secs[lv] : Math.round(ex.reps[lv] * repSec(ex)); }
+function doseText(ex, lv) {
+  const sets = ex.sets[lv];
+  const side = ex.side ? '每側 ' : '';
+  const setTxt = sets > 1 ? `${sets} 組 × ` : '';
+  if (ex.kind === 'hold') return `${side}${setTxt}${ex.secs[lv]} 秒`;
+  const unit = ex.rpc === 2 ? (ex.unitNote || '下（左右算各一）') : '下';
+  return `${side}${setTxt}${ex.reps[lv]} ${unit}`;
+}
+function routineList(key) { return [...WARM, ...ROUTINES[key].main, ...COOL]; }
+function buildBlocks(key, lv) { return buildList(routineList(key), lv); }
+function buildList(ids, lv) {
+  const blocks = [];
+  blocks.push({ type: 'gear', ids, dur: 0 });
+  let prevPlace = null, prevTools = [];
+  ids.forEach((id, i) => {
+    const ex = EX[id];
+    // 換地點、要拿新器材時，準備語音先提醒
+    const place = placeOf(ex), tools = toolsOf(ex).filter(t => t !== '瑜伽墊');
+    const newTools = tools.filter(t => !prevTools.includes(t));
+    let extra = '';
+    if (prevPlace && place !== prevPlace) extra += MOVE_SAY[place];
+    if (newTools.length) extra += `需要${newTools.join('和')}。`;
+    prevPlace = place; prevTools = tools;
+    blocks.push({ type: 'prep', id, idx: i, extra, dur: Math.max(10, Math.ceil(speechSec(extra + prepText(ex)) + 4)) });
+    const sides = ex.side ? ['左側', '右側'] : [null];
+    const sets = ex.sets[lv];
+    sides.forEach((side, si) => {
+      for (let k = 0; k < sets; k++) {
+        blocks.push({ type: 'work', id, idx: i, side, set: k + 1, sets, dur: workSec(ex, lv) });
+        const lastSet = k === sets - 1, lastSide = si === sides.length - 1;
+        if (!lastSet) blocks.push({ type: 'rest', id, idx: i, dur: ex.rest || REST });
+        else if (!lastSide) blocks.push({ type: 'switch', id, idx: i, dur: ex.kind === 'hold' ? 8 : 10 });
+      }
+    });
+  });
+  return blocks;
+}
+// 一份課表會用到的器材與地點
+function gearSummary(ids) {
+  const tools = [], places = [], use = {};
+  ids.forEach(id => {
+    const ex = EX[id];
+    toolsOf(ex).forEach(t => { if (!tools.includes(t)) tools.push(t); (use[t] = use[t] || []).push(ex.name); });
+    const p = placeOf(ex); if (!places.includes(p)) places.push(p);
+  });
+  return { tools, places, use };
+}
+function listMin(ids, lv) { return Math.round(buildList(ids, lv).reduce((a, b) => a + b.dur, 0) / 60); }
+function totalMin(key, lv) { return Math.round(buildBlocks(key, lv).reduce((a, b) => a + b.dur, 0) / 60); }
+
+
+
+// ---------- 臉部刮痧拉提 ----------
+// mode: slide 單向刮 / fan 多條短刮輪流 / press 逐點按壓 / pluck 小幅撥動
+const GUASHA = [
+  { name: '頸部疏通：耳下到鎖骨', goal: '輪廓', mode: 'slide', path: 'M202 150 Q196 200 186 246', strokes: 6, unit: 1700, lab: '次',
+    tool: '板子平貼', brief: ['板子平貼在耳下', '往下刮到鎖骨', '只往下，不來回'],
+    note: '刮痧板平貼，從耳下往下刮到鎖骨。先把出口打開，後面往外刮的水分才有地方走。' },
+  { name: '下顎線拉提', goal: '輪廓', mode: 'slide', path: 'M158 192 Q186 182 203 146', strokes: 8, unit: 1700, lab: '次',
+    tool: '用凹口卡住下顎骨', brief: ['凹口卡住下巴的下顎骨', '沿下顎線刮到耳下', '最後一下在耳下停住，輕抖 2 秒'],
+    note: '用板子的凹口卡住下顎骨，從下巴往耳下刮。最後一下在耳下停住，輕輕抖動 2 秒。' },
+  { name: '咬肌撥鬆', goal: '輪廓', mode: 'pluck', path: 'M186 130 L191 162', pts: 4, strokes: 12, unit: 1000, amp: 6, lab: '下',
+    tool: '用板子邊緣', brief: ['牙齒放鬆', '邊緣壓在咬肌，前後小幅度撥動', '由上往下換 4 個位置'],
+    note: '牙齒放鬆，用板子邊緣壓在咬肌上，前後小幅度撥動。由上往下換四個位置，每個位置撥三下。咬肌放鬆，下半臉會比較不方。' },
+  { name: '嘴角往耳前', goal: '輪廓', mode: 'slide', path: 'M166 158 Q186 146 206 128', strokes: 8, unit: 1700, lab: '次',
+    tool: '長邊平貼', brief: ['從嘴角外側開始', '往耳前方向刮'],
+    note: '從嘴角外側往耳前方向刮，拉提嘴角和法令紋一帶。' },
+  { name: '顴骨下往耳前', goal: '輪廓', mode: 'slide', path: 'M160 126 Q184 120 206 106', strokes: 8, unit: 1700, lab: '次',
+    tool: '長邊平貼', brief: ['從鼻翼旁開始', '沿顴骨下緣凹處刮到耳前', '最後一下在耳前停住，輕抖'],
+    note: '從鼻翼旁沿顴骨下緣的凹處刮到耳前，最後一下在耳前停住輕抖。' },
+  { name: '眼下：內眼角往太陽穴', goal: '眼周細紋', mode: 'slide', path: 'M162 106 Q180 110 198 100', strokes: 5, unit: 2000, lab: '次',
+    tool: '最平滑的邊', brief: ['從內眼角下方開始', '只靠板子重量滑到太陽穴', '速度放慢，不往下壓'],
+    note: '換板子最平滑的邊，從內眼角下方，沿著眼眶下緣慢慢滑到太陽穴。只用板子本身的重量，不往下壓。' },
+  { name: '魚尾紋：眼尾往斜上推', goal: '魚尾紋', mode: 'fan', paths: ['M184 104 L200 94', 'M184 98 L201 86', 'M184 92 L199 78'], strokes: 9, unit: 1400, lab: '次',
+    tool: '板子短邊', brief: ['另一手兩指輕按太陽穴固定皮膚', '從眼尾分三條往斜上方短刮', '皮膚不要被拉動'],
+    note: '另一手兩指輕按太陽穴、固定眼尾皮膚，板子從眼尾分三條往斜上方短刮，每條三次。力道很輕，皮膚不要被拉動。' },
+  { name: '眉骨提拉', goal: '眼周細紋', mode: 'slide', path: 'M156 84 Q180 74 204 86', strokes: 6, unit: 1700, lab: '次',
+    tool: '用凹口卡住眉骨', brief: ['凹口卡住眉頭下方的眉骨', '刮到眉尾，再帶到太陽穴'],
+    note: '用板子凹口卡住眉骨，從眉頭刮到眉尾，再帶到太陽穴。眉骨放鬆，上眼皮比較不會往下壓。' },
+  { name: '額頭往髮際線', goal: '輪廓', mode: 'fan', paths: ['M158 72 L162 46', 'M172 72 L178 48', 'M186 76 L196 52'], strokes: 9, unit: 1400, lab: '次',
+    tool: '長邊平貼', brief: ['從眉毛上方往上刮到髮際線', '分三條，由中間往外側移動'],
+    note: '從眉毛上方往上刮到髮際線，分三條由中間往外側移動，每條三次。額頭放鬆也能幫眉眼往上提。' },
+  { name: '太陽穴按壓', goal: '魚尾紋', mode: 'press', path: 'M199 82 L203 96', pts: 3, strokes: 6, unit: 1300, lab: '下',
+    tool: '用圓角', brief: ['圓角輕壓太陽穴', '每點停一秒再放開', '往下換三個點'],
+    note: '用板子的圓角輕壓太陽穴，每點停一秒再放開，由上往下換三個點，每個點壓兩次。' },
+  { name: '收尾：太陽穴經耳前到鎖骨', goal: '輪廓', mode: 'slide', path: 'M204 88 Q212 118 202 150 Q196 200 186 246', strokes: 5, unit: 1800, lab: '次',
+    tool: '板子平貼', brief: ['從太陽穴開始', '經耳前、耳下刮到鎖骨'],
+    note: '板子平貼，從太陽穴一路經耳前、耳下刮到鎖骨，把水分往下帶走。' }
+];
+GUASHA.forEach(g => { g.face = true; g.pose = '坐或站在鏡子前，背打直'; });
+
+// ---------- 臉部運動：法令紋、輪廓拉提 ----------
+// 臉部參數：mw 嘴寬、mo 張嘴、ms 嘴角上揚、purse 嘟嘴、puffL/puffR/puffU 鼓氣位置、suck 吸頰、up 抬頭、jaw 下巴前推、fing 手指扶顴骨、glow 下巴下方收緊、lift 臉頰上提
+const F0 = { mw: 13, mo: 0, ms: 1, purse: 0, puffL: 0, puffR: 0, puffU: 0, suck: 0, up: 0, jaw: 0, fing: 0, glow: 0, lift: 0 };
+const FX = [
+  { name: '母音暖身：A、E、I、O、U', goal: '暖身', lab: '輪', strokes: 5, tool: '不用板子',
+    brief: ['嘴巴誇張地念出 A、E、I、O、U', '每個音停一下，感覺臉部肌肉被拉開', '眉毛和眼睛放鬆，不要跟著用力'],
+    note: '先暖身。嘴巴誇張地做出 A、E、I、O、U 的口型，每個音停一下。眉毛和眼睛保持放鬆，不要跟著皺。',
+    frames: [{ ...F0, mo: 11, mw: 12 }, { ...F0, mw: 18, mo: 4, ms: 3 }, { ...F0, mw: 20, mo: 2, ms: 6, lift: 0.4 }, { ...F0, mw: 8, mo: 11 }, { ...F0, mw: 6, mo: 3, purse: 1 }],
+    dur: [1100, 1100, 1100, 1100, 1100], cues: ['A', 'E', 'I', 'O', 'U'] },
+  { name: '鼓氣滾動', goal: '法令紋', lab: '輪', strokes: 6, tool: '不用板子',
+    brief: ['閉嘴含一口氣', '把氣推到上唇下方，撐開法令紋', '再滾到右臉頰、左臉頰'],
+    note: '閉上嘴巴含一口氣。先把氣推到上唇下方，從裡面撐開法令紋，再依序滾到右臉頰、左臉頰，各停兩秒。畫面就像鏡子，跟著做同一邊。',
+    frames: [{ ...F0, mw: 9, puffU: 1 }, { ...F0, mw: 9, puffU: 1 }, { ...F0, mw: 9, puffR: 1 }, { ...F0, mw: 9, puffR: 1 }, { ...F0, mw: 9, puffL: 1 }, { ...F0, mw: 9, puffL: 1 }],
+    dur: [1600, 400, 1600, 400, 1600, 400], cues: ['上唇', null, '右臉頰', null, '左臉頰', null] },
+  { name: 'O 型嘴提頰', goal: '法令紋、拉提', lab: '下', strokes: 8, tool: '不用板子',
+    brief: ['嘴巴張成 O 型，嘴唇包住牙齒', '食指輕放在顴骨上', '嘴角往上笑，把臉頰往上推，停 5 秒'],
+    note: '嘴巴張成長長的 O 型，上下嘴唇包住牙齒。兩手食指輕輕放在顴骨上，嘴角往上笑，感覺臉頰往上推到手指，停五秒再放鬆。',
+    frames: [{ ...F0 }, { ...F0, mw: 8, mo: 12, fing: 1 }, { ...F0, mw: 9, mo: 11, ms: 7, fing: 1, lift: 1 }, { ...F0, mw: 9, mo: 11, ms: 7, fing: 1, lift: 1 }, { ...F0, fing: 0 }],
+    dur: [900, 900, 5000, 900, 800], cues: [null, '嘴角往上笑', '保持', '放鬆', null] },
+  { name: '魚嘴吸頰', goal: '拉提', lab: '下', strokes: 8, tool: '不用板子',
+    brief: ['兩頰往內吸，嘴唇嘟成魚嘴', '停 5 秒', '放鬆'],
+    note: '兩邊臉頰往內吸，嘴唇嘟起來像魚嘴，停五秒再放鬆。可以在魚嘴的狀態下試著微笑，效果更好。',
+    frames: [{ ...F0 }, { ...F0, mw: 6, purse: 1, suck: 1 }, { ...F0, mw: 6, purse: 1, suck: 1 }, { ...F0 }],
+    dur: [900, 5000, 900, 1000], cues: [null, '保持', '放鬆', null] },
+  { name: '抬頭推下巴', goal: '下顎線', lab: '下', strokes: 8, tool: '不用板子',
+    brief: ['頭慢慢往後仰，看天花板', '下排牙齒往前推過上排，下唇往上', '感覺下巴下方和脖子前側拉緊，停 5 秒'],
+    note: '頭慢慢往後仰看天花板，下巴往前推，讓下排牙齒超過上排、下唇往上翹，感覺脖子前側拉緊，停五秒再回正。脖子不舒服就不要仰太多。',
+    frames: [{ ...F0 }, { ...F0, up: 1, jaw: 1, glow: 1 }, { ...F0, up: 1, jaw: 1, glow: 1 }, { ...F0 }],
+    dur: [1300, 5000, 1300, 800], cues: ['抬頭', '保持', '回正', null] },
+  { name: '舌頂上顎吞嚥', goal: '下顎線', lab: '下', strokes: 10, tool: '不用板子',
+    brief: ['頭微微抬起', '舌頭整個貼住上顎', '做吞嚥動作，感覺下巴下方收緊'],
+    note: '頭微微抬起，舌頭整個平貼在上顎，用力往上頂，然後做吞嚥的動作，感覺下巴下方收緊。可以改善雙下巴和下顎線。',
+    frames: [{ ...F0 }, { ...F0, up: 0.45, glow: 0.4 }, { ...F0, up: 0.45, glow: 1 }, { ...F0 }],
+    dur: [1000, 1500, 1500, 1000], cues: [null, '舌頂上顎', '吞嚥', '放鬆'] }
+];
+FX.forEach(g => { g.fx = true; g.face = true; g.pose = '坐或站在鏡子前，肩膀放鬆'; g.unit = g.dur.reduce((a, b) => a + b, 0); });
+const GUA = [...FX, ...GUASHA];
+const guaPrepText = g => `下一步，${g.name}。${g.note}`;
+
+function faceMarkup() {
+  return `
+  <path class="face-hair" d="M84 128 C78 46 118 14 150 14 C182 14 222 46 216 128 C210 70 186 42 150 42 C114 42 90 70 84 128Z"/>
+  <path class="face-line" d="M126 186 L122 244 M174 186 L178 244"/>
+  <path class="face-line" d="M92 252 Q118 242 144 250 M156 250 Q182 242 208 252"/>
+  <ellipse class="face-skin" cx="212" cy="120" rx="7" ry="14"/><ellipse class="face-skin" cx="88" cy="120" rx="7" ry="14"/>
+  <path class="face-skin" d="M150 198 C114 198 92 162 92 120 C92 72 116 42 150 42 C184 42 208 72 208 120 C208 162 186 198 150 198Z"/>
+  <path class="face-line" d="M116 84 Q128 78 142 84 M158 84 Q172 78 184 84"/>
+  <path class="face-line" d="M120 100 Q129 95 138 100 M162 100 Q171 95 180 100"/>
+  <path class="face-line" d="M150 106 L146 130 Q150 134 155 130"/>
+  <path class="face-line" d="M136 158 Q150 166 164 158"/>`;
+}
+
+function mountFace(svg, g, mirror) {
+  svg.setAttribute('viewBox', '40 4 220 254');
+  const tf = mirror ? 'translate(300 0) scale(-1 1)' : '';
+  const paths = g.paths || [g.path];
+  svg.innerHTML = faceMarkup() + `<g transform="${tf}">
+      ${paths.map(d => `<path class="guide" d="${d}"/>`).join('')}
+      ${paths.map(d => `<path class="trail" d="${d}"/>`).join('')}
+      <g class="marks"></g><ellipse class="tool" rx="10" ry="5"/></g>`;
+  const trails = [...svg.querySelectorAll('.trail')], tool = svg.querySelector('.tool'), marks = svg.querySelector('.marks');
+  const lens = trails.map(p => p.getTotalLength());
+  trails.forEach((p, i) => { p.style.strokeDasharray = lens[i]; p.style.strokeDashoffset = lens[i]; });
+  const ptAt = (i, f) => trails[i].getPointAtLength(lens[i] * Math.max(0, Math.min(1, f)));
+  const place = (p, ang, sx = 1, o = 1) => {
+    tool.setAttribute('transform', `translate(${p.x} ${p.y}) rotate(${ang}) scale(${sx})`);
+    tool.style.opacity = o;
+  };
+  const tangent = (i, f) => { const a = ptAt(i, f), b = ptAt(i, Math.min(1, f + 0.03)); return Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI; };
+  let lastMarks = -1;
+  return {
+    draw(ms) {
+      ms = Math.max(0, ms);
+      const k = Math.floor(ms / g.unit), t = (ms % g.unit) / g.unit;
+      if (g.mode === 'slide' || g.mode === 'fan') {
+        const i = k % trails.length;
+        const e = easeSine(Math.min(1, t / 0.75));
+        const fade = t < 0.75 ? 1 : 1 - (t - 0.75) / 0.25;
+        place(ptAt(i, e), tangent(i, Math.min(e, 0.97)), 1, fade);
+        trails.forEach((p, j) => {
+          p.style.strokeDashoffset = j === i ? lens[j] * (1 - e) : lens[j];
+          p.style.opacity = j === i ? 0.55 * fade : 0;
+        });
+      } else {
+        const per = g.mode === 'pluck' ? g.strokes / g.pts : g.strokes / g.pts;
+        const i = Math.floor(k / per) % g.pts;
+        const f = g.pts > 1 ? i / (g.pts - 1) : 0;
+        const p = ptAt(0, f), ang = tangent(0, Math.min(f, 0.97));
+        if (g.mode === 'press') {
+          place(p, ang, 0.7 + 0.35 * Math.sin(Math.PI * t), 1);
+        } else {
+          const o = g.amp * Math.sin(Math.PI * 2 * t), r = (ang + 90) * Math.PI / 180;
+          place({ x: p.x + Math.cos(r) * o, y: p.y + Math.sin(r) * o }, ang, 1, 1);
+        }
+        if (i !== lastMarks) {
+          lastMarks = i;
+          let m = '';
+          for (let j = 0; j < g.pts; j++) { const pp = ptAt(0, g.pts > 1 ? j / (g.pts - 1) : 0); m += `<circle cx="${pp.x}" cy="${pp.y}" r="3" class="tool" opacity="${j <= i ? 0.8 : 0.3}"/>`; }
+          marks.innerHTML = m;
+        }
+      }
+    }
+  };
+}
+
+function fxAt(g, ms) {
+  const n = g.frames.length, tot = g.unit;
+  let t = ((ms % tot) + tot) % tot, i = 0;
+  while (i < n - 1 && t > g.dur[i]) { t -= g.dur[i]; i++; }
+  return { f: lerp(g.frames[i], g.frames[(i + 1) % n], easeSine(g.dur[i] ? t / g.dur[i] : 0)), i };
+}
+function fxMarkup(f) {
+  const dy = -14 * f.up;
+  const cx = 150, cy = 158 + dy * 0.2;
+  const L = [cx - f.mw, cy - f.ms], R = [cx + f.mw, cy - f.ms];
+  const o = f.mo + f.purse * 2;
+  const mouth = `M${L} C${cx - f.mw * 0.5},${cy - o - f.purse * 2} ${cx + f.mw * 0.5},${cy - o - f.purse * 2} ${R}
+    C${cx + f.mw * 0.5},${cy + o + f.ms * 0.8 + f.purse * 2} ${cx - f.mw * 0.5},${cy + o + f.ms * 0.8 + f.purse * 2} ${L}Z`;
+  const puff = (x, y, k, rx, ry) => k > 0.02 ? `<ellipse cx="${x}" cy="${y}" rx="${rx * (0.6 + 0.4 * k)}" ry="${ry * (0.6 + 0.4 * k)}" class="fx-puff" opacity="${k.toFixed(2)}"/>` : '';
+  const suck = f.suck > 0.02 ? `<path class="face-line" opacity="${f.suck.toFixed(2)}" d="M118 132 Q128 146 120 162 M182 132 Q172 146 180 162"/>` : '';
+  const lift = f.lift > 0.02 ? `<path class="fx-arrow" opacity="${f.lift.toFixed(2)}" d="M118 140 L114 118 M114 118 L108 126 M114 118 L120 125 M182 140 L186 118 M186 118 L180 125 M186 118 L192 126"/>` : '';
+  const fing = f.fing > 0.02 ? `<g opacity="${f.fing.toFixed(2)}"><path class="fx-finger" d="M108 124 L96 176 M192 124 L204 176"/><circle cx="109" cy="122" r="6" class="tool"/><circle cx="191" cy="122" r="6" class="tool"/></g>` : '';
+  const chin = f.up > 0.02 ? `<path class="face-line" opacity="${f.up.toFixed(2)}" d="M124 ${198 + dy} Q150 ${214 + dy + f.jaw * 4} 176 ${198 + dy}"/>` : '';
+  const glow = f.glow > 0.02 ? `<ellipse cx="150" cy="${206 + dy}" rx="${16 + 6 * f.glow}" ry="7" class="fx-glow" opacity="${(0.25 + 0.5 * f.glow).toFixed(2)}"/>` : '';
+  const jaw = f.jaw > 0.02 ? `<path class="face-line" opacity="${f.jaw.toFixed(2)}" d="M140 ${cy + 8} Q150 ${cy + 4} 160 ${cy + 8}"/>` : '';
+  return `
+  <path class="face-line" d="M126 ${186 + dy} L122 244 M174 ${186 + dy} L178 244"/>
+  <path class="face-line" d="M92 252 Q118 242 144 250 M156 250 Q182 242 208 252"/>
+  ${glow}
+  <g transform="translate(0 ${dy})">
+  <path class="face-hair" d="M84 128 C78 46 118 14 150 14 C182 14 222 46 216 128 C210 70 186 42 150 42 C114 42 90 70 84 128Z"/>
+  <ellipse class="face-skin" cx="212" cy="120" rx="7" ry="14"/><ellipse class="face-skin" cx="88" cy="120" rx="7" ry="14"/>
+  <path class="face-skin" d="M150 198 C${114 + f.suck * 4} 198 ${92 + f.suck * 3} 162 92 120 C92 72 116 42 150 42 C184 42 208 72 208 120 C${208 - f.suck * 3} 162 ${186 - f.suck * 4} 198 150 198Z"/>
+  <path class="face-line" d="M116 ${84 - f.lift * 2} Q128 ${78 - f.lift * 2} 142 84 M158 84 Q172 ${78 - f.lift * 2} 184 ${84 - f.lift * 2}"/>
+  <path class="face-line" d="M120 100 Q129 95 138 100 M162 100 Q171 95 180 100"/>
+  <path class="face-line" d="M150 106 L146 130 Q150 134 155 130"/>
+  ${puff(150, 146, f.puffU, 18, 6)}${puff(180, 150, f.puffR, 13, 15)}${puff(120, 150, f.puffL, 13, 15)}
+  ${suck}
+  <path class="${f.mo > 2 ? 'fx-mouth open' : 'fx-mouth'}" d="${mouth}"/>
+  ${jaw}${chin}${lift}${fing}
+  </g>`;
+}
+function mountFx(svg, g) {
+  svg.setAttribute('viewBox', '40 4 220 254');
+  return { draw(ms) { svg.innerHTML = fxMarkup(fxAt(g, Math.max(0, ms)).f); } };
+}
+
+function mountBody(svg, ex) {
+  svg.setAttribute('viewBox', fitBox(ex).map(v => v.toFixed(1)).join(' '));
+  return { draw(ms) { svg.innerHTML = renderPose(ex, poseAt(ex, ms)); } };
+}
+
+// ---------- 狀態 ----------
+const now = new Date();
+const S = { tab: 'body', day: now.getDay(), lv: 0 };
+const $ = (sel, el = document) => el.querySelector(sel);
+const app = $('#app');
+let loops = [];   // 首頁與說明頁的循環動畫
+function loop(ts) { loops.forEach(l => l.m.draw(ts - l.t0)); requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+const SHORT = { A: '臀', B: '腹', C: '背', L: '輕', R: '休' };
+
+function render() {
+  loops = [];
+  if (S.tab === 'body') renderBody(); else renderGua();
+}
+
+function tabsHtml() {
+  return `<div class="tabs" role="tablist">
+    <button role="tab" aria-selected="${S.tab === 'body'}" data-tab="body">身體訓練</button>
+    <button role="tab" aria-selected="${S.tab === 'gua'}" data-tab="gua">臉部刮痧</button></div>
+    ${voiceSettingsHtml()}`;
+}
+function voiceSettingsHtml() {
+  return `<button class="vset" id="vsetBtn">語音聲音設定</button>`;
+}
+function openVoiceSheet() {
+  pickVoice();
+  const list = zhVoices().sort((a, b) => (VOICE.prefer.test(b.name) - VOICE.prefer.test(a.name)) || voiceScore(b) - voiceScore(a));
+  const el = document.createElement('div');
+  el.className = 'sheet';
+  const opts = list.map((v, i) => `<option value="${i}" ${VOICE.voice && v.name === VOICE.voice.name ? 'selected' : ''}>${esc(v.name)}（${esc(v.lang)}）</option>`).join('');
+  el.innerHTML = `<div class="box" role="dialog" aria-label="語音聲音設定">
+    <button class="close">完成</button>
+    <h3 style="margin-top:8px">語音聲音</h3>
+    <p class="meta">聲音的音色來自手機內建語音，這裡可以挑選聲音、調整音調。</p>
+    <label class="vrow"><span>聲音</span>
+      ${list.length ? `<select id="vSel">${opts}</select>` : '<em>這個瀏覽器沒有提供中文語音</em>'}</label>
+    <label class="vrow"><span>音調</span>
+      <input type="range" id="vPitch" min="0.6" max="1.2" step="0.05" value="${VOICE.pitch}">
+      <small id="vPitchTxt"></small></label>
+    <div class="vends"><small>低沉溫和</small><small>明亮清脆</small></div>
+    <label class="vrow"><span>語速</span>
+      <input type="range" id="vRate" min="0.8" max="1.2" step="0.05" value="${VOICE.rate}">
+      <small id="vRateTxt"></small></label>
+    <div class="vends"><small>慢</small><small>快</small></div>
+    <button class="start" id="vTry">試聽</button>
+    <button class="start" id="vTest" style="background:var(--plum);color:var(--cream);margin-top:-12px">語音與提示音測試</button>
+    <div class="vtest" id="vTestOut" hidden></div>
+    <p class="note">想要更自然的聲音：iPhone 到「設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文（台灣）」，如果有「增強版」或「高品質」的聲音可以下載。下載後重新打開這個工具，就會出現在聲音選單裡，並且會優先使用。</p></div>`;
+  document.body.appendChild(el);
+  const pt = $('#vPitchTxt', el), rt = $('#vRateTxt', el);
+  const sync = () => { pt.textContent = VOICE.pitch.toFixed(2); rt.textContent = VOICE.rate.toFixed(2) + ' 倍'; };
+  sync();
+  const sel = $('#vSel', el);
+  if (sel) sel.onchange = () => { VOICE.voice = list[+sel.value]; };
+  $('#vPitch', el).oninput = e => { VOICE.pitch = +e.target.value; sync(); };
+  $('#vRate', el).oninput = e => { VOICE.rate = +e.target.value; sync(); };
+  $('#vTry', el).onclick = () => { const was = voiceOn; voiceOn = true; say('好，慢慢吸氣。吐氣，放鬆肩膀。我們開始吧。'); voiceOn = was; };
+  $('#vTest', el).onclick = () => runVoiceTest($('#vTestOut', el));
+  const close = () => el.remove();
+  $('.close', el).onclick = close;
+  el.onclick = e => { if (e.target === el) close(); };
+}
+
+// 在手機上實際檢查：有沒有中文語音、語音有沒有開始和播完、提示音能不能響
+function runVoiceTest(out) {
+  out.hidden = false;
+  const lines = [];
+  const show = () => (out.innerHTML = lines.map(l => `<div class="${l[0]}">${esc(l[1])}</div>`).join(''));
+  const add = (ok, txt) => { lines.push([ok === true ? 'ok' : ok === false ? 'bad' : 'wait', txt]); show(); return lines.length - 1; };
+  const set = (i, ok, txt) => { lines[i] = [ok ? 'ok' : 'bad', txt]; show(); };
+  if (!('speechSynthesis' in window)) { add(false, '這個瀏覽器不支援語音播放，請改用 Safari 或 Chrome 打開。'); return; }
+  pickVoice();
+  const zh = zhVoices();
+  add(zh.length > 0, zh.length ? `找到 ${zh.length} 個中文聲音` : '沒有找到中文聲音，會用系統預設聲音');
+  add(!!VOICE.voice, VOICE.voice ? `使用聲音：${VOICE.voice.name}（${VOICE.voice.lang}）` : '尚未選到指定聲音');
+  unlockAudio(); beep(660, 160);
+  add(actx && actx.state === 'running', actx && actx.state === 'running' ? '提示音：已播放一聲「嗶」' : '提示音：音效尚未啟動，請再按一次測試');
+  const was = voiceOn; voiceOn = true;
+  const iStart = add(null, '語音：等待開始播放…');
+  let started = false;
+  let finished = false;
+  say('語音測試。第一句。這是第二句，用來確認長段說明可以完整念完。聽得到嗎？', false, ok => {
+    finished = true;
+    set(iStart, ok, ok ? '語音：完整播放完畢，運作正常' : '語音：播放中斷或失敗，請看下方說明');
+    if (!ok) add(false, '請確認手機沒有開啟靜音、媒體音量已調高，再重新測試。');
+  }, () => { started = true; if (!finished) { lines[iStart] = ['wait', '語音：正在播放…']; show(); } });
+  voiceOn = was;
+  setTimeout(() => {
+    if (!started && lines[iStart][0] === 'wait') {
+      set(iStart, false, '語音：3 秒內沒有開始播放');
+      add(false, '請確認手機沒有開啟靜音、媒體音量已調高；iPhone 可到「設定 → 輔助使用 → 朗讀內容」確認中文聲音已下載。');
+    }
+  }, 3000);
+}
+
+function bindTabs() {
+  const vb = document.getElementById('vsetBtn');
+  if (vb) vb.onclick = openVoiceSheet;
+  app.querySelectorAll('[data-tab]').forEach(b => (b.onclick = () => { S.tab = b.dataset.tab; render(); }));
+}
+
+function gearBox(g, title) {
+  const chip = s => `<span>${esc(s)}</span>`;
+  return `<div class="gear"><b>${title}</b>
+    ${g.tools.length ? `<div><i>器材</i>${g.tools.map(chip).join('')}</div>` : ''}
+    <div><i>地點</i>${g.places.map(chip).join('')}</div></div>`;
+}
+
+function renderBody() {
+  const key = WEEK[S.day];
+  const R = ROUTINES[key];
+  const ids = routineList(key);
+  const mins = totalMin(key, S.lv);
+  const dateTxt = `${now.getMonth() + 1} 月 ${now.getDate()} 日，星期${DAYNAMES[now.getDay()]}`;
+  const row = (id, i) => {
+    const ex = EX[id];
+    return `<li><button data-ex="${id}"><span class="n">${i + 1}</span>
+      <span class="nm">${esc(ex.name)}<span class="ds">${esc(ex.pose)}<br>${doseText(ex, S.lv)}</span></span>
+      ${ex.src ? '<span class="src">你的影片</span>' : '<span></span>'}</button></li>`;
+  };
+  let n = 0;
+  const sec = (title, list) => list.length ? `<h2>${title}</h2><ol class="list">${list.map(id => row(id, n++)).join('')}</ol>` : '';
+  app.innerHTML = `<div class="wrap">
+    ${tabsHtml()}
+    <p class="date">${S.day === now.getDay() ? dateTxt : '星期' + DAYNAMES[S.day] + '的課表'}</p>
+    <h1>${R.name}</h1>
+    <p class="sub">${R.focus}，約 ${mins} 分鐘</p>
+    <div class="week">${[1, 2, 3, 4, 5, 6, 0].map(d => `<button aria-pressed="${d === S.day}" class="${d === now.getDay() ? 'today' : ''}" data-day="${d}"><b>${DAYNAMES[d]}</b><span>${SHORT[WEEK[d]]}</span></button>`).join('')}</div>
+    <div class="level">${LEVELS.map((l, i) => `<button aria-pressed="${i === S.lv}" data-lv="${i}">${l}</button>`).join('')}</div>
+    <div class="stage hero"><svg id="heroSvg" aria-label="${esc(EX[ids[0]].name)}動作示範"></svg><span class="tag">第一個動作：${esc(EX[ids[0]].name)}</span></div>
+    <button class="start" id="startBtn">開始跟練（約 ${mins} 分鐘）</button>
+    ${gearBox(gearSummary(ids), '今天會用到')}
+    ${sec('暖身', WARM)}${sec('主訓練', R.main)}${sec('收操', COOL)}
+    <h2 style="margin-top:34px">每日床邊伸展</h2>
+    <p class="sub" style="margin:0 0 10px">每天都做，約 ${listMin(BEDSET, S.lv)} 分鐘。可以接在訓練後，也可以睡前另外做。</p>
+    <ol class="list">${BEDSET.map(id => row(id, n++)).join('')}</ol>
+    <button class="start" id="bedBtn" style="background:var(--plum);color:var(--cream)">開始床邊伸展（約 ${listMin(BEDSET, S.lv)} 分鐘）</button>
+    ${gearBox(gearSummary(BEDSET), '床邊伸展會用到')}
+    <p class="note" style="margin-top:0">頭懸在床邊時，床緣要對齊肩膀上緣，不是脖子中間。有高血壓、青光眼或眼壓高、頸椎問題、懷孕或容易頭暈的人先不要做頭部懸空，可以把頭放在床上做束腳和抱腿。過程中頭暈、頭痛或眼睛脹就停下來，起身時先翻到側躺再慢慢坐起。</p>
+    ${key === 'R' ? '<p class="note">今天讓身體休息。做完伸展，可以接著到「臉部刮痧」。</p>' : ''}
+    ${key === 'L' ? '<p class="note">星期四去練習場，所以只排核心精簡版。打完球回家做也可以。</p>' : ''}
+    <p class="note">點任何動作可以看步驟和注意事項。每兩週動作熟練後，切換到下一個階段增加次數。腰或膝蓋出現疼痛（不是痠）就停下來。</p>
+  </div>`;
+  bindTabs();
+  loops.push({ m: mountBody($('#heroSvg'), EX[ids[0]]), t0: performance.now() });
+  app.querySelectorAll('[data-day]').forEach(b => (b.onclick = () => { S.day = +b.dataset.day; render(); }));
+  app.querySelectorAll('[data-lv]').forEach(b => (b.onclick = () => { S.lv = +b.dataset.lv; render(); }));
+  app.querySelectorAll('[data-ex]').forEach(b => (b.onclick = () => openSheet(b.dataset.ex)));
+  $('#startBtn').onclick = () => startPlayer(buildBlocks(key, S.lv), R.name, S.lv, true);
+  $('#bedBtn').onclick = () => startPlayer(buildList(BEDSET, S.lv), '每日床邊伸展', S.lv);
+}
+
+function openSheet(id) {
+  const ex = EX[id];
+  const el = document.createElement('div');
+  el.className = 'sheet';
+  el.innerHTML = `<div class="box" role="dialog" aria-label="${esc(ex.name)}">
+    <button class="close">關閉</button>
+    <div class="stage" style="margin-top:44px"><svg></svg>${ex.view === 'top' ? '<span class="tag">俯視圖</span>' : ''}</div>
+    <h3>${esc(ex.name)}</h3>
+    <p class="meta">姿勢：${esc(ex.pose)}<br>${doseText(ex, S.lv)}${ex.src ? `，來自你收藏的「${esc(ex.src)}」` : ''}</p>
+    <div class="chips">${ex.tags.map(t => `<span>${t}</span>`).join('')}</div>
+    <p class="meta">地點：${placeOf(ex)}${toolsOf(ex).length ? `　器材：${toolsOf(ex).join('、')}` : ''}</p>
+    <p>${esc(ex.cue)}</p>
+    <h4>步驟</h4><ol>${ex.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+    <h4>注意</h4><ul>${ex.tips.map(s => `<li>${esc(s)}</li>`).join('')}</ul></div>`;
+  document.body.appendChild(el);
+  const entry = { m: mountBody($('svg', el), ex), t0: performance.now() };
+  loops.push(entry);
+  const close = () => { el.remove(); loops = loops.filter(l => l !== entry); };
+  $('.close', el).onclick = close;
+  el.onclick = e => { if (e.target === el) close(); };
+}
+
+function guaBlocks() {
+  const blocks = [{ type: 'gear', face: true, dur: 0 }];
+  GUA.forEach((g, i) => {
+    blocks.push({ type: 'prep', gua: i, dur: Math.max(6, Math.ceil(speechSec(guaPrepText(g)) + 4)) });
+    const d = Math.round(g.strokes * g.unit / 1000);
+    if (g.fx) { blocks.push({ type: 'work', gua: i, reps: g.strokes, dur: d }); return; }
+    // 畫面像鏡子：先做右臉（畫面右側），再做左臉
+    blocks.push({ type: 'work', gua: i, side: '右臉', reps: g.strokes, dur: d });
+    blocks.push({ type: 'switch', gua: i, dur: 5 });
+    blocks.push({ type: 'work', gua: i, side: '左臉', reps: g.strokes, dur: d, mirror: true });
+  });
+  return blocks;
+}
+function renderGua() {
+  const secs = g => Math.round(g.strokes * g.unit / 1000);
+  const blocks = guaBlocks();
+  const mins = Math.round(blocks.reduce((a, b) => a + b.dur, 0) / 60);
+  const fxMin = Math.round(blocks.filter(b => b.gua !== undefined && GUA[b.gua].fx).reduce((a, b) => a + b.dur, 0) / 60);
+  const row = (g, i) => `<li><button tabindex="-1"><span class="n">${i + 1}</span><span class="nm">${esc(g.name)}<span class="ds">${esc(g.goal)}${g.fx ? '' : '，' + esc(g.tool)}<br>${g.fx ? '' : '每側 '}${g.strokes} ${g.lab}，約 ${secs(g)} 秒</span></span><span></span></button></li>`;
+  const fanIdx = GUA.findIndex(g => g.mode === 'fan');
+  app.innerHTML = `<div class="wrap">
+    ${tabsHtml()}
+    <p class="date">建議睡前做，運動後也可以</p>
+    <h1>臉部刮痧拉提</h1>
+    <p class="sub">臉部運動加刮痧：法令紋、輪廓拉提、魚尾紋與眼周細紋，約 ${mins} 分鐘</p>
+    <div class="stage hero"><svg id="faceSvg" aria-label="臉部動作示範"></svg><span class="tag">${esc(GUA[2].name)}</span></div>
+    <button class="start" id="guaBtn">開始（約 ${mins} 分鐘）</button>
+    ${gearBox({ tools: ['刮痧板', '臉部油或精華'], places: ['鏡子前（坐或站）'] }, '會用到')}
+    <h2>臉部運動（約 ${fxMin} 分鐘）</h2>
+    <ol class="list">${GUA.map((g, i) => g.fx ? row(g, i) : '').join('')}</ol>
+    <h2>刮痧</h2>
+    <ol class="list">${GUA.map((g, i) => g.fx ? '' : row(g, i)).join('')}</ol>
+    <h2>開始前</h2>
+    <p class="note" style="margin-top:6px">先做臉部運動，再擦油刮痧。臉部運動時眉毛和眼周保持放鬆，不要跟著皺眉或瞇眼，避免加深表情紋。<br><br>
+    刮痧時臉和脖子擦上足量的油或精華，板子要能順滑，不能卡住拉扯皮膚。板子幾乎平貼皮膚（約 15 度），每一下只往一個方向刮，不來回。輪廓的部分用中等力道；眼周只用板子本身的重量，另一手可以輕按固定眼尾。臉部不需要刮到出痧或發紅，有傷口、痘痘或發炎的地方跳過。畫面就像鏡子，先做右臉，再做左臉。<br><br>
+    關於效果：臉部運動的研究不多，有一個小型研究發現規律做 20 週後臉頰比較飽滿，但能不能淡化法令紋沒有明確證據；刮痧則能暫時消水腫。對細紋和魚尾紋，最有效的仍是每天防曬、保濕、使用 A 醇類保養品，以及不要常揉眼睛。這些動作適合當搭配。</p>
+  </div>`;
+  bindTabs();
+  loops.push({ m: mountFx($('#faceSvg'), GUA[2]), t0: performance.now() });
+  $('#guaBtn').onclick = () => startPlayer(guaBlocks(), '臉部刮痧拉提');
+}
+
+// ---------- 聲音與語音 ----------
+let actx = null, voiceOn = true;
+// iOS 需要在使用者點按時先喚醒音效，之後計時器觸發的嗶聲才有聲音
+function unlockAudio() {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state !== 'running') actx.resume();
+    const b = actx.createBuffer(1, 1, 22050), s = actx.createBufferSource();
+    s.buffer = b; s.connect(actx.destination); s.start(0);
+  } catch (e) {}
+}
+function beep(freq = 880, ms = 120) {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state !== 'running') actx.resume();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.frequency.value = freq; o.connect(g); g.connect(actx.destination);
+    g.gain.setValueAtTime(0.15, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + ms / 1000);
+    o.start(); o.stop(actx.currentTime + ms / 1000);
+  } catch (e) {}
+}
+// ---------- 語音聲音：挑手機上最自然的中文聲音，音調調低讓聲音比較溫和 ----------
+// 預設：婷婷（zh-CN）、音調 0.85、語速 1.05
+const VOICE = { voice: null, pitch: 0.85, rate: 1.05, prefer: /tingting|婷婷/i };
+function zhVoices() {
+  if (!('speechSynthesis' in window)) return [];
+  return speechSynthesis.getVoices().filter(v => /^zh|cmn/i.test(v.lang));
+}
+function voiceScore(v) {
+  let s = 0;
+  if (/TW|Hant/i.test(v.lang)) s += 40; else if (/HK/i.test(v.lang)) s += 15; else s += 10;
+  if (/enhanced|premium|增強|高品質|natural|neural/i.test(v.name)) s += 30;
+  if (/google/i.test(v.name)) s += 5;
+  if (v.localService) s += 3;
+  return s;
+}
+function pickVoice() {
+  const list = zhVoices();
+  if (!list.length) return;
+  if (VOICE.voice && list.some(v => v.name === VOICE.voice.name)) return;
+  // 先找婷婷（有增強版就用增強版），找不到再依自然程度挑
+  const fav = list.filter(v => VOICE.prefer.test(v.name)).sort((a, b) => voiceScore(b) - voiceScore(a))[0];
+  VOICE.voice = fav || list.slice().sort((a, b) => voiceScore(b) - voiceScore(a))[0];
+}
+if ('speechSynthesis' in window) {
+  pickVoice();
+  speechSynthesis.addEventListener?.('voiceschanged', pickVoice);
+}
+
+// 語音播放：
+// - 長段說明拆成一句一句排隊播放（Chrome 單句超過約 15 秒會中斷）
+// - 自己記錄「正在說話」的時間，iOS 的 speaking 狀態有時不準
+// - soft：呼吸提示等次要語音，正在說話時就略過，不打斷
+let busyUntil = 0, sayId = 0;
+const SPEECH_LOG = [];
+function logSpeech(s) { SPEECH_LOG.push(s); if (SPEECH_LOG.length > 20) SPEECH_LOG.shift(); }
+function splitSpeech(t) {
+  const parts = t.split(/(?<=[。！？])/).map(s => s.trim()).filter(Boolean);
+  const out = [];
+  parts.forEach(p => {
+    while (p.length > 45) { const k = p.lastIndexOf('，', 45); const cut = k > 10 ? k + 1 : 45; out.push(p.slice(0, cut)); p = p.slice(cut); }
+    if (p) out.push(p);
+  });
+  return out.length ? out : [t];
+}
+function say(t, soft = false, onend, onstart) {
+  if (!voiceOn || !('speechSynthesis' in window)) { onend && onend(false); return null; }
+  try {
+    const now = performance.now();
+    if (soft && now < busyUntil) return null;
+    if (!VOICE.voice) pickVoice();
+    if (now < busyUntil || speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
+    const id = ++sayId, chunks = splitSpeech(t);
+    busyUntil = now + (speechSec(t) / VOICE.rate) * 1000 + 600;
+    let first = null;
+    chunks.forEach((c, i) => {
+      const u = new SpeechSynthesisUtterance(c);
+      if (VOICE.voice) { u.voice = VOICE.voice; u.lang = VOICE.voice.lang; } else u.lang = 'zh-TW';
+      u.rate = VOICE.rate; u.pitch = VOICE.pitch;
+      if (i === 0) { first = u; u.onstart = () => { logSpeech('start'); onstart && onstart(); }; }
+      const last = i === chunks.length - 1;
+      u.onend = () => { if (last && id === sayId) { busyUntil = 0; logSpeech('end'); onend && onend(true); } };
+      u.onerror = e => {
+        logSpeech('error:' + (e && e.error));
+        if (id === sayId && (last || (e && e.error !== 'interrupted' && e.error !== 'canceled'))) { busyUntil = 0; onend && onend(false); }
+      };
+      speechSynthesis.speak(u);
+    });
+    return first;
+  } catch (e) { onend && onend(false); return null; }
+}
+
+// ---------- 螢幕恆亮：Wake Lock，加上靜音影片備援（iOS 舊版也有效）----------
+const NOSLEEP_SRC = 'data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAANLbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAB9AAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAnV0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAB9AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAABAAAAAQAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAfQAAAAAAABAAAAAAHtbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAUABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABmG1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAVhzdGJsAAAAuHN0c2QAAAAAAAAAAQAAAKhhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAABAAEABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAALmF2Y0MBQsAK/+EAFmdCwArZHsBEAAADAAQAAAMAKDxImSABAAVoy4PLIAAAABBwYXNwAAAAAQAAAAEAAAAUYnRydAAAAAAAAAtYAAALWAAAABhzdHRzAAAAAAAAAAEAAAAKAAAIAAAAABRzdHNzAAAAAAAAAAEAAAABAAAAHHN0c2MAAAAAAAAAAQAAAAEAAAAKAAAAAQAAADxzdHN6AAAAAAAAAAAAAAAKAAACgwAAAAoAAAAKAAAACQAAAAkAAAAJAAAACQAAAAkAAAAJAAAACQAAABRzdGNvAAAAAAAAAAEAAAN7AAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY2MC4xNi4xMDAAAAAIZnJlZQAAAt5tZGF0AAACcAYF//9s3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE2NCByMzEwOCAzMWUxOWY5IC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAyMyAtIGh0dHA6Ly93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbCAtIG9wdGlvbnM6IGNhYmFjPTAgcmVmPTMgZGVibG9jaz0xOjA6MCBhbmFseXNlPTB4MToweDExMSBtZT1oZXggc3VibWU9NyBwc3k9MSBwc3lfcmQ9MS4wMDowLjAwIG1peGVkX3JlZj0xIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MSA4eDhkY3Q9MCBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNldD0tMiB0aHJlYWRzPTEgbG9va2FoZWFkX3RocmVhZHM9MSBzbGljZWRfdGhyZWFkcz0wIG5yPTAgZGVjaW1hdGU9MSBpbnRlcmxhY2VkPTAgYmx1cmF5X2NvbXBhdD0wIGNvbnN0cmFpbmVkX2ludHJhPTAgYmZyYW1lcz0wIHdlaWdodHA9MCBrZXlpbnQ9MjUwIGtleWludF9taW49NSBzY2VuZWN1dD00MCBpbnRyYV9yZWZyZXNoPTAgcmNfbG9va2FoZWFkPTQwIHJjPWNyZiBtYnRyZWU9MSBjcmY9MjMuMCBxY29tcD0wLjYwIHFwbWluPTAgcXBtYXg9NjkgcXBzdGVwPTQgaXBfcmF0aW89MS40MCBhcT0xOjEuMDAAgAAAAAtliIQEfJigADYjgAAAAAZBmjgI+oAAAAAGQZpUAj6gAAAABUGaYBH1AAAABUGagBH1AAAABUGaoBH1AAAABUGawBH1AAAABUGa4BH1AAAABUGbABD1AAAABUGbID/U';
+function createAwake() {
+  let wake = null, timer = 0, on = false;
+  const v = document.createElement('video');
+  v.setAttribute('playsinline', ''); v.setAttribute('muted', ''); v.muted = true; v.loop = true;
+  v.src = NOSLEEP_SRC;
+  v.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0.01;pointer-events:none;bottom:0;left:0';
+  document.body.appendChild(v);
+  const req = async () => {
+    if (!on) return;
+    try { if (!wake || wake.released) wake = await navigator.wakeLock?.request('screen'); } catch (e) {}
+    try { if (v.paused) await v.play(); } catch (e) {}
+  };
+  const vis = () => { if (!document.hidden) req(); };
+  return {
+    start() { on = true; req(); clearInterval(timer); timer = setInterval(req, 15000); document.addEventListener('visibilitychange', vis); },
+    stop() {
+      on = false; clearInterval(timer); document.removeEventListener('visibilitychange', vis);
+      try { wake?.release(); } catch (e) {} try { v.pause(); } catch (e) {} v.remove();
+    }
+  };
+}
+
+// ---------- 跟練 ----------
+function startPlayer(blocks, title, lv = 0, offerBed = false) {
+  unlockAudio();
+  blocks = blocks.map(b => ({ ...b }));
+  let bi = 0, el = 0, running = true, last = null, lastSec = -1, lastSeg = -1, raf = 0;
+  let prepWait = false, prepToken = 0;
+  const total = blocks.reduce((a, b) => a + b.dur, 0);
+  const exCount = new Set(blocks.filter(b => b.type !== 'gear').map(b => b.idx ?? b.gua)).size;
+  const awake = createAwake();
+  awake.start();
+  const node = document.createElement('div');
+  node.className = 'player';
+  node.innerHTML = `<div class="in">
+    <div class="ptop"><button id="pClose" aria-label="結束跟練">結束</button><span class="grow" id="pPos"></span><button id="pVoice"></button></div>
+    <div class="bar"><i id="pBar"></i></div>
+    <div class="stage" id="pStage"><div class="orb" id="pOrb"></div><svg id="pSvg"></svg><span class="tag" id="pTag" hidden></span></div>
+    <div class="pname" id="pName"></div>
+    <div class="pstate" id="pState"></div>
+    <div class="big"><b id="pBig"></b><span id="pUnit"></span><div class="breath" id="pBreath" hidden></div></div>
+    <div class="pmeta" id="pMeta"></div>
+    <ol class="pbrief" id="pBrief"></ol>
+    <div class="pcue" id="pCue"></div>
+    <div class="ctrl"><button id="pPrev">上一步</button><button class="main" id="pPlay">暫停</button><button id="pNext">下一步</button></div>
+    <details class="how"><summary>看詳細說明</summary><ol id="pSteps"></ol></details></div>`;
+  document.body.appendChild(node);
+  document.body.style.overflow = 'hidden';
+  const q = id => node.querySelector('#' + id);
+  const svg = q('pSvg'), orb = q('pOrb'), br = q('pBreath');
+  let mounted = null, mountedKey = '';
+
+  const itemOf = b => (b.type === 'gear' ? null : b.gua !== undefined ? GUA[b.gua] : EX[b.id]);
+  const nextWork = i => { for (let j = i; j < blocks.length; j++) if (blocks[j].type === 'work') return blocks[j]; return null; };
+  const setVoiceLabel = () => (q('pVoice').textContent = voiceOn ? '語音開' : '語音關');
+  setVoiceLabel();
+  const isTimed = b => b.type !== 'gear' && (b.type === 'rest' || b.type === 'switch' || b.type === 'prep' || (b.type === 'work' && !itemOf(b).face && itemOf(b).kind === 'hold'));
+
+  const gearOf = b => b.face
+    ? { tools: ['刮痧板', '臉部油或精華'], places: ['鏡子前（坐或站）'], use: {} }
+    : gearSummary(b.ids);
+  function announce() {
+    const b = blocks[bi], it = itemOf(b);
+    prepWait = false;
+    if (b.type === 'gear') {
+      const g = gearOf(b);
+      say(`開始前先準備。${g.tools.length ? '器材：' + g.tools.join('、') + '。' : ''}地點：${g.places.join('、')}。準備好了，請按開始。`);
+      return;
+    }
+    if (b.type === 'work') {
+      const head = [b.side, b.sets > 1 ? `第${b.set}組` : ''].filter(Boolean).join('，');
+      let amount;
+      if (it.face) amount = `${b.reps}${it.lab}`;
+      else if (it.kind === 'hold') amount = `保持${b.dur}秒`;
+      else amount = `${Math.round(b.dur / repSec(it))}下`;
+      say(`${head ? head + '，' : ''}${amount}，開始`);
+    } else if (b.type === 'rest') say(`休息${b.dur}秒`);
+    else if (b.type === 'switch') say(b.gua !== undefined ? '換左臉' : '換邊');
+    else if (b.type === 'prep') {
+      // 說明念完才開始最後 5 秒倒數
+      const txt = it.face
+        ? (b.gua === FX.length ? '臉部運動完成，接下來刮痧。先在臉和脖子擦上足量的油或精華，拿起刮痧板。畫面就像鏡子，每個動作先做右臉，再做左臉。' : '') + guaPrepText(it) + (b.gua === 0 ? '整個過程保持自然呼吸。' : '')
+        : (b.extra || '') + prepText(it);
+      const token = ++prepToken, est = speechSec(txt);
+      const u = say(txt, false, () => {
+        if (token !== prepToken || blocks[bi] !== b) return;
+        prepWait = false; b.dur = el + 5;
+      });
+      if (u) { prepWait = true; b.est = est; }
+    }
+  }
+  function go(i) {
+    if (i >= blocks.length) return finish();
+    gearDrawn = false;
+    bi = Math.max(0, i); el = 0; lastSec = -1; lastSeg = -1; announce(); beep(660, 140);
+  }
+  function finish() {
+    running = false; cancelAnimationFrame(raf); awake.stop();
+    say('全部完成，做得很好');
+    node.querySelector('.in').innerHTML = `<div class="done"><h2>完成了</h2>
+      <p>${esc(title)}，共 ${exCount} 個項目，約 ${Math.round(total / 60)} 分鐘。<br>${offerBed ? '別忘了今天的床邊伸展。' : '記得到習慣追蹤器打勾。'}</p>
+      ${offerBed ? '<button class="start" id="pBed">接著做床邊伸展（約 ' + listMin(BEDSET, lv) + ' 分鐘）</button>' : ''}
+      <button class="start" id="pBack" style="background:rgba(255,255,255,.12);color:var(--cream)">回到首頁</button></div>`;
+    node.querySelector('#pBack').onclick = close;
+    if (offerBed) node.querySelector('#pBed').onclick = () => { close(); startPlayer(buildList(BEDSET, lv), '每日床邊伸展', lv); };
+  }
+  function close() {
+    cancelAnimationFrame(raf); awake.stop();
+    try { speechSynthesis.cancel(); } catch (e) {}
+    node.remove(); document.body.style.overflow = '';
+  }
+
+  // 計時項目的語音：每 30 秒、最後 10 秒、倒數 5 秒
+  function timeCues(b, left) {
+    if (left === lastSec || !running) return;
+    lastSec = left;
+    const passed = Math.round(b.dur - left);
+    if (left >= 1 && left <= 5) { if (passed >= 2) { say(String(left)); beep(990, 60); } return; } // 剛開始的提示語不被倒數打斷
+    if (left === 10 && b.dur > 12) { say('最後10秒'); return; }
+    if (passed > 0 && passed % 30 === 0 && left > 10 && b.type !== 'prep') say(`還有${left}秒`);
+  }
+
+  function setOrb(lv, w) {
+    if (lv === null) { orb.style.opacity = 0; return; }
+    orb.style.opacity = (0.22 + 0.4 * lv).toFixed(2);
+    orb.style.transform = `translate(-50%,-50%) scale(${(0.45 + 0.6 * lv).toFixed(3)})`;
+    orb.dataset.w = w && w.includes('in') ? 'in' : 'out';
+  }
+
+  let gearDrawn = false;
+  function drawGear(b, ts) {
+    const nw = nextWork(bi), sit = itemOf(nw);
+    const key = (nw.gua !== undefined ? 'g' + nw.gua : nw.id) + (nw.mirror ? 'm' : '');
+    if (key !== mountedKey) { mounted = sit.fx ? mountFx(svg, sit) : sit.face ? mountFace(svg, sit, !!nw.mirror) : mountBody(svg, sit); mountedKey = key; }
+    mounted.draw(ts);
+    q('pStage').classList.add('dim'); setOrb(null); br.hidden = true;
+    if (gearDrawn) return;
+    gearDrawn = true;
+    const g = gearOf(b);
+    q('pPos').textContent = '開始前';
+    q('pBar').style.width = '0%';
+    q('pName').textContent = '準備器材';
+    q('pState').textContent = `第一個動作：${sit.name}`;
+    q('pBig').textContent = ''; q('pUnit').textContent = '';
+    q('pMeta').innerHTML = (g.tools.length ? `<div><span>器材</span>${esc(g.tools.join('、'))}</div>` : '') + `<div><span>地點</span>${esc(g.places.join('、'))}</div>`;
+    q('pBrief').innerHTML = g.tools.map(t => {
+      const u = [...new Set(g.use[t] || [])];
+      const txt = u.length > 3 ? `大部分地板動作（${u.length} 個）` : u.join('、');
+      return `<li>${esc(t)}${txt ? '：' + esc(txt) : ''}</li>`;
+    }).join('');
+    q('pCue').textContent = '都準備好了，按「開始」。';
+    q('pPlay').textContent = '開始';
+  }
+
+  function frame(ts) {
+    raf = requestAnimationFrame(frame);
+    if (last === null) last = ts;
+    const dt = Math.min(0.25, (ts - last) / 1000); last = ts;
+    const b = blocks[bi];
+    if (b.type === 'gear') { drawGear(b, ts); return; }
+    if (running) {
+      el += dt;
+      if (b.type === 'prep' && prepWait) {
+        // 說明還沒念完：停在倒數 5 秒前等待；語音異常時用估計時間的兩倍作保險
+        if (el > (b.est || 20) * 2 + 10) { prepWait = false; b.dur = el + 5; }
+        else b.dur = Math.max(b.dur, el + 5.01);
+      }
+    }
+    if (el >= b.dur) { go(bi + 1); return; }
+    const it = itemOf(b);
+    const show = b.type === 'work' ? b : nextWork(bi) || b;
+    const sit = itemOf(show);
+    const key = (show.gua !== undefined ? 'g' + show.gua : show.id) + (show.mirror ? 'm' : '');
+    if (key !== mountedKey) {
+      mounted = sit.fx ? mountFx(svg, sit) : sit.face ? mountFace(svg, sit, !!show.mirror) : mountBody(svg, sit);
+      mountedKey = key;
+      const gs = s => Math.round(s.strokes * s.unit / 1000);
+      const chips = sit.face
+        ? [['姿勢', sit.pose], ['板子', sit.tool], ['次數', `${sit.fx ? '' : '每側 '}${sit.strokes} ${sit.lab}，約 ${gs(sit)} 秒`]]
+        : [['姿勢', sit.pose], ['次數', doseText(sit, lv)]];
+      q('pMeta').innerHTML = chips.filter(c => c[1]).map(([k, v]) => `<div><span>${k}</span>${esc(v)}</div>`).join('');
+      q('pBrief').innerHTML = (sit.brief || []).map(s => `<li>${esc(s)}</li>`).join('');
+      q('pSteps').innerHTML = sit.face ? `<li>${esc(sit.note)}</li>` : sit.steps.map(s => `<li>${esc(s)}</li>`).join('');
+      const tag = q('pTag');
+      tag.hidden = !(sit.view === 'top');
+      tag.textContent = '俯視圖';
+    }
+    const animMs = b.type === 'work' ? el * 1000 : ts;
+    mounted.draw(animMs);
+    q('pStage').classList.toggle('dim', b.type !== 'work');
+
+    // 呼吸：語音提示＋光圈縮放
+    if (b.type === 'work' && !it.face && it.breath) {
+      const ms = el * 1000, { lv: L, w } = breathLevel(it, ms);
+      setOrb(L, w);
+      const sg = segAt(it, ms);
+      if (sg !== lastSeg) {
+        lastSeg = sg;
+        const ww = it.breath[sg];
+        if (ww) {
+          const txt = ww === 'in' ? '吸氣' : '吐氣';
+          br.textContent = txt; br.dataset.w = ww; br.hidden = false;
+          if (el > 0.4 && running) say(txt, true);
+        }
+      }
+    } else if (b.type === 'work' && it.fx && it.cues) {
+      // 臉部運動：依動作階段提示「保持」「放鬆」等
+      setOrb(null);
+      const sg = fxAt(it, el * 1000).i;
+      if (sg !== lastSeg) {
+        lastSeg = sg;
+        const c = it.cues[sg];
+        if (c) { br.textContent = c; br.dataset.w = /放鬆|回正/.test(c) ? 'out' : 'in'; br.hidden = false; if (el > 0.4 && running) say(c, true); }
+      }
+    } else if (b.type === 'rest' || b.type === 'switch') {
+      // 休息時：吸 4 秒、吐 6 秒的恢復呼吸，只有畫面提示
+      const c = (el % 10);
+      const inh = c < 4, L = inh ? easeSine(c / 4) : 1 - easeSine((c - 4) / 6);
+      setOrb(L, inh ? 'in' : 'out');
+      br.textContent = inh ? '慢慢吸氣' : '慢慢吐氣'; br.dataset.w = inh ? 'in' : 'out'; br.hidden = false;
+    } else { setOrb(null); br.hidden = true; }
+
+    const left = Math.ceil(b.dur - el);
+    if (isTimed(b) && !(b.type === 'prep' && prepWait)) timeCues(b, left);
+
+    const done = blocks.slice(0, bi).reduce((a, x) => a + x.dur, 0) + el;
+    q('pBar').style.width = Math.min(100, 100 * done / total).toFixed(1) + '%';
+    const exIdx = (b.idx ?? b.gua) + 1;
+    q('pPos').textContent = `第 ${exIdx} / ${exCount} 項`;
+    q('pPlay').textContent = running ? '暫停' : '繼續';
+
+    if (b.type === 'work') {
+      q('pName').textContent = it.name;
+      const st = [b.side, b.sets > 1 ? `第 ${b.set} / ${b.sets} 組` : ''].filter(Boolean).join('　');
+      q('pState').textContent = st;
+      if (it.face) {
+        const cur = Math.min(b.reps, Math.floor(el * 1000 / it.unit) + 1);
+        q('pBig').textContent = cur; q('pUnit').textContent = `/ ${b.reps} ${it.lab}`;
+      } else if (it.kind === 'hold') {
+        q('pBig').textContent = left; q('pUnit').textContent = '秒';
+      } else {
+        const rs = repSec(it), reps = Math.round(b.dur / rs);
+        const cur = Math.min(reps, Math.floor(el / rs) + 1);
+        q('pBig').textContent = cur; q('pUnit').textContent = `/ ${reps} 下`;
+      }
+      q('pCue').textContent = '';
+    } else {
+      const label = { rest: '休息', prep: '準備', switch: b.gua !== undefined ? '換左臉' : '換邊' }[b.type];
+      q('pName').textContent = label;
+      q('pState').textContent = b.type === 'rest' ? `下一組：${sit.name}` : sit.name;
+      if (b.type === 'prep' && prepWait) { q('pBig').textContent = '…'; q('pUnit').textContent = '語音說明中'; }
+      else { q('pBig').textContent = left; q('pUnit').textContent = '秒'; }
+      q('pCue').textContent = b.type === 'rest' ? '喝口水，跟著光圈慢慢呼吸' : '';
+    }
+  }
+
+  q('pPlay').onclick = () => {
+    if (blocks[bi].type === 'gear') { go(bi + 1); return; }
+    running = !running;
+    try { running ? speechSynthesis.resume() : speechSynthesis.pause(); } catch (e) {}
+  };
+  q('pNext').onclick = () => go(bi + 1);
+  q('pPrev').onclick = () => (el > 2 ? go(bi) : go(bi - 1));
+  q('pClose').onclick = close;
+  q('pVoice').onclick = () => {
+    voiceOn = !voiceOn; setVoiceLabel();
+    if (!voiceOn) { try { speechSynthesis.cancel(); } catch (e) {} if (prepWait) { prepWait = false; blocks[bi].dur = el + 5; } }
+  };
+  announce();
+  raf = requestAnimationFrame(frame);
+}
+
+render();
+
+</script>
+</body>
+</html>
