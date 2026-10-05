@@ -875,40 +875,45 @@ GUASHA.forEach(g => { g.face = true; g.pose = '坐或站在鏡子前，背打直
 // 臉部參數：mw 嘴寬、mo 張嘴、ms 嘴角上揚、purse 嘟嘴、puffL/puffR/puffU 鼓氣位置、suck 吸頰、up 抬頭、jaw 下巴前推、fing 手指扶顴骨、glow 下巴下方收緊、lift 臉頰上提
 const F0 = { mw: 13, mo: 0, ms: 1, purse: 0, puffL: 0, puffR: 0, puffU: 0, suck: 0, up: 0, jaw: 0, fing: 0, glow: 0, lift: 0 };
 const FX = [
-  { name: '母音暖身：A、E、I、O、U', goal: '暖身', lab: '輪', strokes: 5, tool: '不用板子',
-    brief: ['嘴巴誇張地念出 A、E、I、O、U', '每個音停一下，感覺臉部肌肉被拉開', '眉毛和眼睛放鬆，不要跟著用力'],
+  { name: '母音暖身：A、E、I、O、U', sayPrep: '跟著念 A、E、I、O、U，嘴型做大。', goal: '暖身', lab: '輪', strokes: 3, tool: '不用板子',
+    brief: ['跟著語音誇張地做出 A、E、I、O、U 的口型', '每個音停一下', '眉毛和眼睛放鬆'],
     note: '先暖身。嘴巴誇張地做出 A、E、I、O、U 的口型，每個音停一下。眉毛和眼睛保持放鬆，不要跟著皺。',
-    frames: [{ ...F0, mo: 11, mw: 12 }, { ...F0, mw: 18, mo: 4, ms: 3 }, { ...F0, mw: 20, mo: 2, ms: 6, lift: 0.4 }, { ...F0, mw: 8, mo: 11 }, { ...F0, mw: 6, mo: 3, purse: 1 }],
-    dur: [1100, 1100, 1100, 1100, 1100], cues: ['A', 'E', 'I', 'O', 'U'] },
-  { name: '鼓氣滾動', goal: '法令紋', lab: '輪', strokes: 6, tool: '不用板子',
-    brief: ['閉嘴含一口氣', '把氣推到上唇下方，撐開法令紋', '再滾到右臉頰、左臉頰'],
-    note: '閉上嘴巴含一口氣。先把氣推到上唇下方，從裡面撐開法令紋，再依序滾到右臉頰、左臉頰，各停兩秒。畫面就像鏡子，跟著做同一邊。',
+    frames: [{ ...F0, mo: 11, mw: 12 }, { ...F0, mo: 11, mw: 12 }, { ...F0, mw: 18, mo: 4, ms: 3 }, { ...F0, mw: 18, mo: 4, ms: 3 },
+      { ...F0, mw: 20, mo: 2, ms: 6, lift: 0.4 }, { ...F0, mw: 20, mo: 2, ms: 6, lift: 0.4 }, { ...F0, mw: 8, mo: 11 }, { ...F0, mw: 8, mo: 11 },
+      { ...F0, mw: 6, mo: 3, purse: 1 }, { ...F0, mw: 6, mo: 3, purse: 1 }],
+    dur: [1800, 700, 1800, 700, 1800, 700, 1800, 700, 1800, 700], cues: [null, 'E', null, 'I', null, 'O', null, 'U', null, 'A'] },
+  { name: '鼓氣滾動', sayPrep: '含一口氣，跟著語音換位置。', goal: '法令紋', lab: '輪', strokes: 4, tool: '不用板子',
+    brief: ['閉嘴含一口氣', '依語音把氣推到上唇、右臉頰、左臉頰', '每個位置停約 3 秒'],
+    note: '閉上嘴巴含一口氣。先把氣推到上唇下方，從裡面撐開法令紋，再依序滾到右臉頰、左臉頰，每個位置停約三秒。畫面就像鏡子，跟著做同一邊。',
     frames: [{ ...F0, mw: 9, puffU: 1 }, { ...F0, mw: 9, puffU: 1 }, { ...F0, mw: 9, puffR: 1 }, { ...F0, mw: 9, puffR: 1 }, { ...F0, mw: 9, puffL: 1 }, { ...F0, mw: 9, puffL: 1 }],
-    dur: [1600, 400, 1600, 400, 1600, 400], cues: ['上唇', null, '右臉頰', null, '左臉頰', null] },
-  { name: 'O 型嘴提頰', goal: '法令紋、拉提', lab: '下', strokes: 8, tool: '不用板子',
+    dur: [2600, 800, 2600, 800, 2600, 800], cues: [null, '右臉頰', null, '左臉頰', null, '上唇'] },
+  { name: 'O 型嘴提頰', sayPrep: '嘴巴 O 型，食指放顴骨，往上笑。', goal: '法令紋、拉提', lab: '下', strokes: 6, tool: '不用板子',
     brief: ['嘴巴張成 O 型，嘴唇包住牙齒', '食指輕放在顴骨上', '嘴角往上笑，把臉頰往上推，停 5 秒'],
     note: '嘴巴張成長長的 O 型，上下嘴唇包住牙齒。兩手食指輕輕放在顴骨上，嘴角往上笑，感覺臉頰往上推到手指，停五秒再放鬆。',
     frames: [{ ...F0 }, { ...F0, mw: 8, mo: 12, fing: 1 }, { ...F0, mw: 9, mo: 11, ms: 7, fing: 1, lift: 1 }, { ...F0, mw: 9, mo: 11, ms: 7, fing: 1, lift: 1 }, { ...F0, fing: 0 }],
-    dur: [900, 900, 5000, 900, 800], cues: [null, '嘴角往上笑', '保持', '放鬆', null] },
-  { name: '魚嘴吸頰', goal: '拉提', lab: '下', strokes: 8, tool: '不用板子',
+    dur: [2000, 2200, 5000, 1500, 1300], cues: ['O 型嘴', '往上笑', '保持', '放鬆', null] },
+  { name: '魚嘴吸頰', sayPrep: '臉頰往內吸，嘟成魚嘴。', goal: '拉提', lab: '下', strokes: 6, tool: '不用板子',
     brief: ['兩頰往內吸，嘴唇嘟成魚嘴', '停 5 秒', '放鬆'],
     note: '兩邊臉頰往內吸，嘴唇嘟起來像魚嘴，停五秒再放鬆。可以在魚嘴的狀態下試著微笑，效果更好。',
     frames: [{ ...F0 }, { ...F0, mw: 6, purse: 1, suck: 1 }, { ...F0, mw: 6, purse: 1, suck: 1 }, { ...F0 }],
-    dur: [900, 5000, 900, 1000], cues: [null, '保持', '放鬆', null] },
-  { name: '抬頭推下巴', goal: '下顎線', lab: '下', strokes: 8, tool: '不用板子',
-    brief: ['頭慢慢往後仰，看天花板', '下排牙齒往前推過上排，下唇往上', '感覺下巴下方和脖子前側拉緊，停 5 秒'],
-    note: '頭慢慢往後仰看天花板，下巴往前推，讓下排牙齒超過上排、下唇往上翹，感覺脖子前側拉緊，停五秒再回正。脖子不舒服就不要仰太多。',
+    dur: [2000, 5000, 1500, 2000], cues: ['吸臉頰', '保持', '放鬆', null] },
+  { name: '抬頭推下巴', sayPrep: '頭往後仰，下巴往前推。', goal: '下顎線', lab: '下', strokes: 6, tool: '不用板子',
+    brief: ['頭慢慢往後仰，看天花板', '下巴往前推，下唇往上', '感覺脖子前側拉緊，停 5 秒'],
+    note: '頭慢慢往後仰看天花板，下巴往前推，讓下排牙齒超過上排、下唇往上翹，感覺脖子前側拉緊，停五秒再慢慢回正。脖子不舒服就不要仰太多。',
     frames: [{ ...F0 }, { ...F0, up: 1, jaw: 1, glow: 1 }, { ...F0, up: 1, jaw: 1, glow: 1 }, { ...F0 }],
-    dur: [1300, 5000, 1300, 800], cues: ['抬頭', '保持', '回正', null] },
-  { name: '舌頂上顎吞嚥', goal: '下顎線', lab: '下', strokes: 10, tool: '不用板子',
+    dur: [2000, 5000, 2000, 1800], cues: ['慢慢抬頭', '保持', '慢慢回正', null] },
+  { name: '舌頂上顎吞嚥', sayPrep: '舌頭頂住上顎，做吞嚥。', goal: '下顎線', lab: '下', strokes: 8, tool: '不用板子',
     brief: ['頭微微抬起', '舌頭整個貼住上顎', '做吞嚥動作，感覺下巴下方收緊'],
     note: '頭微微抬起，舌頭整個平貼在上顎，用力往上頂，然後做吞嚥的動作，感覺下巴下方收緊。可以改善雙下巴和下顎線。',
     frames: [{ ...F0 }, { ...F0, up: 0.45, glow: 0.4 }, { ...F0, up: 0.45, glow: 1 }, { ...F0 }],
-    dur: [1000, 1500, 1500, 1000], cues: [null, '舌頂上顎', '吞嚥', '放鬆'] }
+    dur: [1800, 2200, 2200, 1800], cues: ['舌頂上顎', '吞嚥', '放鬆', null] }
 ];
 FX.forEach(g => { g.fx = true; g.face = true; g.pose = '坐或站在鏡子前，肩膀放鬆'; g.unit = g.dur.reduce((a, b) => a + b, 0); });
 const GUA = [...FX, ...GUASHA];
 const guaPrepText = g => `下一步，${g.name}。${g.note}`;
+// 臉部運動的準備語音只念重點，縮短等待
+const fxPrepText = g => `${g.name}。${g.sayPrep}`;
+const facePrepText = g => (g.fx ? fxPrepText(g) : guaPrepText(g));
 
 function faceMarkup() {
   return `
@@ -1202,7 +1207,7 @@ function openSheet(id) {
 function guaBlocks() {
   const blocks = [{ type: 'gear', face: true, dur: 0 }];
   GUA.forEach((g, i) => {
-    blocks.push({ type: 'prep', gua: i, dur: Math.max(6, Math.ceil(speechSec(guaPrepText(g)) + 4)) });
+    blocks.push({ type: 'prep', gua: i, dur: Math.max(5, Math.ceil(speechSec(facePrepText(g)) + (g.fx ? 3 : 5))) });
     const d = Math.round(g.strokes * g.unit / 1000);
     if (g.fx) { blocks.push({ type: 'work', gua: i, reps: g.strokes, dur: d }); return; }
     // 畫面像鏡子：先做右臉（畫面右側），再做左臉
@@ -1295,7 +1300,7 @@ if ('speechSynthesis' in window) {
 // - 長段說明拆成一句一句排隊播放（Chrome 單句超過約 15 秒會中斷）
 // - 自己記錄「正在說話」的時間，iOS 的 speaking 狀態有時不準
 // - soft：呼吸提示等次要語音，正在說話時就略過，不打斷
-let busyUntil = 0, sayId = 0;
+let busyUntil = 0, sayId = 0, lastSoft = 0;
 const SPEECH_LOG = [];
 function logSpeech(s) { SPEECH_LOG.push(s); if (SPEECH_LOG.length > 20) SPEECH_LOG.shift(); }
 function splitSpeech(t) {
@@ -1312,10 +1317,13 @@ function say(t, soft = false, onend, onstart) {
   try {
     const now = performance.now();
     if (soft && now < busyUntil) return null;
+    // 跟著做的提示（吸氣、吐氣、保持…）兩句之間至少隔 2 秒，避免念太快
+    if (soft === true && t.length <= 6 && now - lastSoft < 2000) return null;
+    if (soft === true) lastSoft = now;
     if (!VOICE.voice) pickVoice();
     if (now < busyUntil || speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
     const id = ++sayId, chunks = splitSpeech(t);
-    busyUntil = now + (speechSec(t) / VOICE.rate) * 1000 + 600;
+    busyUntil = now + (speechSec(t) / VOICE.rate) * 1000 + 300;
     let first = null;
     chunks.forEach((c, i) => {
       const u = new SpeechSynthesisUtterance(c);
@@ -1335,13 +1343,15 @@ function say(t, soft = false, onend, onstart) {
 }
 
 // ---------- 螢幕恆亮：Wake Lock，加上靜音影片備援（iOS 舊版也有效）----------
-const NOSLEEP_SRC = 'data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAANLbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAB9AAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAnV0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAB9AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAABAAAAAQAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAfQAAAAAAABAAAAAAHtbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAUABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABmG1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAVhzdGJsAAAAuHN0c2QAAAAAAAAAAQAAAKhhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAABAAEABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAALmF2Y0MBQsAK/+EAFmdCwArZHsBEAAADAAQAAAMAKDxImSABAAVoy4PLIAAAABBwYXNwAAAAAQAAAAEAAAAUYnRydAAAAAAAAAtYAAALWAAAABhzdHRzAAAAAAAAAAEAAAAKAAAIAAAAABRzdHNzAAAAAAAAAAEAAAABAAAAHHN0c2MAAAAAAAAAAQAAAAEAAAAKAAAAAQAAADxzdHN6AAAAAAAAAAAAAAAKAAACgwAAAAoAAAAKAAAACQAAAAkAAAAJAAAACQAAAAkAAAAJAAAACQAAABRzdGNvAAAAAAAAAAEAAAN7AAAAYnVkdGEAAABabWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAtaWxzdAAAACWpdG9vAAAAHWRhdGEAAAABAAAAAExhdmY2MC4xNi4xMDAAAAAIZnJlZQAAAt5tZGF0AAACcAYF//9s3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE2NCByMzEwOCAzMWUxOWY5IC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAyMyAtIGh0dHA6Ly93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbCAtIG9wdGlvbnM6IGNhYmFjPTAgcmVmPTMgZGVibG9jaz0xOjA6MCBhbmFseXNlPTB4MToweDExMSBtZT1oZXggc3VibWU9NyBwc3k9MSBwc3lfcmQ9MS4wMDowLjAwIG1peGVkX3JlZj0xIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MSA4eDhkY3Q9MCBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNldD0tMiB0aHJlYWRzPTEgbG9va2FoZWFkX3RocmVhZHM9MSBzbGljZWRfdGhyZWFkcz0wIG5yPTAgZGVjaW1hdGU9MSBpbnRlcmxhY2VkPTAgYmx1cmF5X2NvbXBhdD0wIGNvbnN0cmFpbmVkX2ludHJhPTAgYmZyYW1lcz0wIHdlaWdodHA9MCBrZXlpbnQ9MjUwIGtleWludF9taW49NSBzY2VuZWN1dD00MCBpbnRyYV9yZWZyZXNoPTAgcmNfbG9va2FoZWFkPTQwIHJjPWNyZiBtYnRyZWU9MSBjcmY9MjMuMCBxY29tcD0wLjYwIHFwbWluPTAgcXBtYXg9NjkgcXBzdGVwPTQgaXBfcmF0aW89MS40MCBhcT0xOjEuMDAAgAAAAAtliIQEfJigADYjgAAAAAZBmjgI+oAAAAAGQZpUAj6gAAAABUGaYBH1AAAABUGagBH1AAAABUGaoBH1AAAABUGawBH1AAAABUGa4BH1AAAABUGbABD1AAAABUGbID/U';
+const NOSLEEP_WEBM = 'data:video/webm;base64,GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQRChYECGFOAZwEAAAAAAA3PEU2bdLpNu4tTq4QVSalmU6yBoU27i1OrhBZUrmtTrIHYTbuMU6uEElTDZ1OsggGETbuMU6uEHFO7a1Osgg257AEAAAAAAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVSalmsirXsYMPQkBNgI1MYXZmNjAuMTYuMTAwV0GNTGF2ZjYwLjE2LjEwMESJiECvUAAAAAAAFlSua0CmrgEAAAAAAAA414EBc8WIV8ZVwIciLvicgQAitZyDdW5kiIEAhoVWX1ZQOIOBASPjg4QL68IA4ImwgRC6gRCagQKuAQAAAAAAAFzXgQJzxYgCZ6HJ/uQrNZyBACK1nIN1bmSIgQCGhkFfT1BVU1aqg2MuoFa7hATEtACDgQLhkZ+BAbWIQOdwAAAAAABiZIEQY6KTT3B1c0hlYWQBATgBgLsAAAAAABJUw2dA1nNzoGPAgGfImkWjh0VOQ09ERVJEh41MYXZmNjAuMTYuMTAwc3PWY8CLY8WIV8ZVwIciLvhnyKFFo4dFTkNPREVSRIeUTGF2YzYwLjMxLjEwMiBsaWJ2cHhnyKFFo4hEVVJBVElPTkSHkzAwOjAwOjA0LjAwMDAwMDAwMABzc9djwItjxYgCZ6HJ/uQrNWfIokWjh0VOQ09ERVJEh5VMYXZjNjAuMzEuMTAyIGxpYm9wdXNnyKFFo4hEVVJBVElPTkSHkzAwOjAwOjA0LjAwODAwMDAwMAAfQ7Z1S1PngQCji4IAAIAIC+S5oLyEo6OBAACAEAIAnQEqEAAQAABHCIWFiIWEiAICAAwNYAD+/6tQgKOKggAVgAgHxrMOxqOKggApgAgHxrMOxqOKggA9gAgHxrMOxqOKggBRgAgHxrMOxqOKggBlgAgHxrMOxqOKggB5gAgHxrMOxqOKggCNgAgHxrMOxqOKggChgAgHxrMOxqOKggC1gAgHxrMOxqOKggDJgAgHxrMOxqOVgQDIALEBAAEQEAAYABhYL/QACAAAo4qCAN2ACAfGsw7Go4qCAPGACAfGsw7Go4qCAQWACAfGsw7Go4qCARmACAfGsw7Go4qCAS2ACAfGsw7Go4qCAUGACAfGsw7Go4qCAVWACAfGsw7Go4qCAWmACAfGsw7Go4qCAX2ACAfGsw7Go4qCAZGACAfGsw7Go5WBAZAAsQEAARAQABgAGFgv9AAIAACjioIBpYAIB8azDsajioIBuYAIB8azDsajioIBzYAIB8azDsajioIB4YAIB8azDsajioIB9YAIB8azDsajioICCYAIB8azDsajioICHYAIB8azDsajioICMYAIB8azDsajioICRYAIB8azDsajioICWYAIB8azDsajlYECWACxAQABEBAAGAAYWC/0AAgAAKOKggJtgAgHxrMOxqOKggKBgAgHxrMOxqOKggKVgAgHxrMOxqOKggKpgAgHxrMOxqOKggK9gAgHxrMOxqOKggLRgAgHxrMOxqOKggLlgAgHxrMOxqOKggL5gAgHxrMOxqOKggMNgAgHxrMOxqOKggMhgAgHxrMOxqOVgQMgALEBAAEQEAAYABhYL/QACAAAo4qCAzWACAfGsw7Go4qCA0mACAfGsw7Go4qCA12ACAfGsw7Go4qCA3GACAfGsw7Go4qCA4WACAfGsw7Go4qCA5mACAfGsw7Go4qCA62ACAfGsw7Go4qCA8GACAfGsw7Go4qCA9WACAfGsw7Go4qCA+mACAfGsw7Go5WBA+gAsQEAARAQABgAGFgv9AAIAACjioID/YAIB8azDsajioIEEYAIB8azDsajioIEJYAIB8azDsajioIEOYAIB8azDsajioIETYAIB8azDsajioIEYYAIB8azDsajioIEdYAIB8azDsajioIEiYAIB8azDsajioIEnYAIB8azDsajioIEsYAIB8azDsajlYEEsACxAQABEBAAGAAYWC/0AAgAAKOKggTFgAgHxrMOxqOKggTZgAgHxrMOxqOKggTtgAgHxrMOxqOKggUBgAgHxrMOxqOKggUVgAgHxrMOxqOKggUpgAgHxrMOxqOKggU9gAgHxrMOxqOKggVRgAgHxrMOxqOKggVlgAgHxrMOxqOKggV5gAgHxrMOxqOVgQV4ALEBAAEQEBRgAGFgv9AAIAAAo4qCBY2ACAfGsw7Go4qCBaGACAfGsw7Go4qCBbWACAfGsw7Go4qCBcmACAfGsw7Go4qCBd2ACAfGsw7Go4qCBfGACAfGsw7Go4qCBgWACAfGsw7Go4qCBhmACAfGsw7Go4qCBi2ACAfGsw7Go4qCBkGACAfGsw7Go5WBBkAAsQEAARAQABgAGFgv9AAIAACjioIGVYAIB8azDsajioIGaYAIB8azDsajioIGfYAIB8azDsajioIGkYAIB8azDsajioIGpYAIB8azDsajioIGuYAIB8azDsajioIGzYAIB8azDsajioIG4YAIB8azDsajioIG9YAIB8azDsajioIHCYAIB8azDsajlYEHCACxAQABEBAAGAAYWC/0AAgAAKOKggcdgAgHxrMOxqOKggcxgAgHxrMOxqOKggdFgAgHxrMOxqOKggdZgAgHxrMOxqOKggdtgAgHxrMOxqOKggeBgAgHxrMOxqOKggeVgAgHxrMOxqOKggepgAgHxrMOxqOKgge9gAgHxrMOxqOKggfRgAgHxrMOxqOVgQfQALEBAAEQEAAYABhYL/QACAAAo4qCB+WACAfGsw7Go4qCB/mACAfGsw7Go4qCCA2ACAfGsw7Go4qCCCGACAfGsw7Go4qCCDWACAfGsw7Go4qCCEmACAfGsw7Go4qCCF2ACAfGsw7Go4qCCHGACAfGsw7Go4qCCIWACAfGsw7Go4qCCJmACAfGsw7Go5WBCJgAsQEAARAQABgAGFgv9AAIAACjioIIrYAIB8azDsajioIIwYAIB8azDsajioII1YAIB8azDsajioII6YAIB8azDsajioII/YAIB8azDsajioIJEYAIB8azDsajioIJJYAIB8azDsajioIJOYAIB8azDsajioIJTYAIB8azDsajioIJYYAIB8azDsajlYEJYACxAQABEBAAGAAYWC/0AAgAAKOKggl1gAgHxrMOxqOKggmJgAgHxrMOxqOKggmdgAgHxrMOxqOKggmxgAgHxrMOxqOKggnFgAgHxrMOxqOKggnZgAgHxrMOxqOKggntgAgHxrMOxqOKggoBgAgHxrMOxqOKggoVgAgHxrMOxqOKggopgAgHxrMOxqOVgQooALEBAAEQEAAYABhYL/QACAAAo4qCCj2ACAfGsw7Go4qCClGACAfGsw7Go4qCCmWACAfGsw7Go4qCCnmACAfGsw7Go4qCCo2ACAfGsw7Go4qCCqGACAfGsw7Go4qCCrWACAfGsw7Go4qCCsmACAfGsw7Go4qCCt2ACAfGsw7Go4qCCvGACAfGsw7Go5WBCvAAsQEAARAQABgAGFgv9AAIAACjioILBYAIB8azDsajioILGYAIB8azDsajioILLYAIB8azDsajioILQYAIB8azDsajioILVYAIB8azDsajioILaYAIB8azDsajioILfYAIB8azDsajioILkYAIB8azDsajioILpYAIB8azDsajioILuYAIB8azDsajlYELuACxAQABEBAAGAAYWC/0AAgAAKOKggvNgAgHxrMOxqOKggvhgAgHxrMOxqOKggv1gAgHxrMOxqOKggwJgAgHxrMOxqOKggwdgAgHxrMOxqOKggwxgAgHxrMOxqOKggxFgAgHxrMOxqOKggxZgAgHxrMOxqOKggxtgAgHxrMOxqOKggyBgAgHxrMOxqOVgQyAALEBAAEQEAAYABhYL/QACAAAo4qCDJWACAfGsw7Go4qCDKmACAfGsw7Go4qCDL2ACAfGsw7Go4qCDNGACAfGsw7Go4qCDOWACAfGsw7Go4qCDPmACAfGsw7Go4qCDQ2ACAfGsw7Go4qCDSGACAfGsw7Go4qCDTWACAfGsw7Go4qCDUmACAfGsw7Go5WBDUgAsQEAARAQABgAGFgv9AAIAACjioINXYAIB8azDsajioINcYAIB8azDsajioINhYAIB8azDsajioINmYAIB8azDsajioINrYAIB8azDsajioINwYAIB8azDsajioIN1YAIB8azDsajioIN6YAIB8azDsajioIN/YAIB8azDsajioIOEYAIB8azDsajlYEOEACxAQABEBAUYABhYL/QACAAAKOKgg4lgAgHxrMOxqOKgg45gAgHxrMOxqOKgg5NgAgHxrMOxqOKgg5hgAgHxrMOxqOKgg51gAgHxrMOxqOKgg6JgAgHxrMOxqOKgg6dgAgHxrMOxqOKgg6xgAgHxrMOxqOKgg7FgAgHxrMOxqOKgg7ZgAgHxrMOxqOVgQ7YALEBAAEQEAAYABhYL/QACAAAo4qCDu2ACAfGsw7Go4qCDwGACAfGsw7Go4qCDxWACAfGsw7Go4qCDymACAfGsw7Go4qCDz2ACAfGsw7Go4qCD1GACAfGsw7Go4qCD2WACAfGsw7Go4qCD3mACAfGsw7Go4qCD42ACAfGsw7GoJOhioIPoQAIB8azDsZ1ooQAzf5gHFO7a5G7j7OBALeK94EB8YICYPCBEA==';
+const NOSLEEP_SRC = 'data:video/mp4;base64,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';
 function createAwake() {
   let wake = null, timer = 0, on = false;
   const v = document.createElement('video');
-  v.setAttribute('playsinline', ''); v.setAttribute('muted', ''); v.muted = true; v.loop = true;
-  v.src = NOSLEEP_SRC;
-  v.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0.01;pointer-events:none;bottom:0;left:0';
+  v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', ''); v.setAttribute('muted', ''); v.muted = true; v.loop = true; v.preload = 'auto';
+  // iPhone 用 mp4；不支援 mp4 的瀏覽器改用 webm
+  v.src = v.canPlayType('video/mp4; codecs="avc1.42E01E"') ? NOSLEEP_SRC : NOSLEEP_WEBM;
+  v.style.cssText = 'position:fixed;width:4px;height:4px;opacity:0.02;pointer-events:none;bottom:0;left:0;z-index:-1';
   document.body.appendChild(v);
   const req = async () => {
     if (!on) return;
@@ -1349,8 +1359,11 @@ function createAwake() {
     try { if (v.paused) await v.play(); } catch (e) {}
   };
   const vis = () => { if (!document.hidden) req(); };
+  // iOS 有時會暫停影片（例如來電、通知），每次換段落、每次碰螢幕都重新確認
+  v.addEventListener('pause', () => { if (on) setTimeout(req, 300); });
   return {
-    start() { on = true; req(); clearInterval(timer); timer = setInterval(req, 15000); document.addEventListener('visibilitychange', vis); },
+    poke: req,
+    start() { on = true; req(); clearInterval(timer); timer = setInterval(req, 5000); document.addEventListener('visibilitychange', vis); },
     stop() {
       on = false; clearInterval(timer); document.removeEventListener('visibilitychange', vis);
       try { wake?.release(); } catch (e) {} try { v.pause(); } catch (e) {} v.remove();
@@ -1384,6 +1397,8 @@ function startPlayer(blocks, title, lv = 0, offerBed = false) {
     <details class="how"><summary>看詳細說明</summary><ol id="pSteps"></ol></details></div>`;
   document.body.appendChild(node);
   document.body.style.overflow = 'hidden';
+  node.addEventListener('touchstart', () => awake.poke(), { passive: true });
+  node.addEventListener('click', () => awake.poke());
   const q = id => node.querySelector('#' + id);
   const svg = q('pSvg'), orb = q('pOrb'), br = q('pBreath');
   let mounted = null, mountedKey = '';
@@ -1402,7 +1417,7 @@ function startPlayer(blocks, title, lv = 0, offerBed = false) {
     prepWait = false;
     if (b.type === 'gear') {
       const g = gearOf(b);
-      say(`開始前先準備。${g.tools.length ? '器材：' + g.tools.join('、') + '。' : ''}地點：${g.places.join('、')}。準備好了，請按開始。`);
+      say(`開始前先準備。${g.tools.length ? '器材：' + g.tools.join('、') + '。' : ''}地點：${g.places.join('、')}。${b.face ? '整個過程保持自然呼吸。' : ''}準備好了，請按開始。`);
       return;
     }
     if (b.type === 'work') {
@@ -1417,18 +1432,19 @@ function startPlayer(blocks, title, lv = 0, offerBed = false) {
     else if (b.type === 'prep') {
       // 說明念完才開始最後 5 秒倒數
       const txt = it.face
-        ? (b.gua === FX.length ? '臉部運動完成，接下來刮痧。先在臉和脖子擦上足量的油或精華，拿起刮痧板。畫面就像鏡子，每個動作先做右臉，再做左臉。' : '') + guaPrepText(it) + (b.gua === 0 ? '整個過程保持自然呼吸。' : '')
+        ? (b.gua === FX.length ? '臉部運動完成，接下來刮痧。先在臉和脖子擦上足量的油或精華，拿起刮痧板。畫面就像鏡子，每個動作先做右臉，再做左臉。' : '') + facePrepText(it)
         : (b.extra || '') + prepText(it);
       const token = ++prepToken, est = speechSec(txt);
       const u = say(txt, false, () => {
         if (token !== prepToken || blocks[bi] !== b) return;
-        prepWait = false; b.dur = el + 5;
+        prepWait = false; b.dur = el + (it.fx ? 3 : 5);  // 臉部運動倒數 3 秒，其餘 5 秒
       });
-      if (u) { prepWait = true; b.est = est; }
+      if (u) { prepWait = true; b.estMs = (est / VOICE.rate) * 1000; b.cd = it.fx ? 3 : 5; }
     }
   }
   function go(i) {
     if (i >= blocks.length) return finish();
+    awake.poke();
     gearDrawn = false;
     bi = Math.max(0, i); el = 0; lastSec = -1; lastSeg = -1; announce(); beep(660, 140);
   }
@@ -1453,7 +1469,7 @@ function startPlayer(blocks, title, lv = 0, offerBed = false) {
     if (left === lastSec || !running) return;
     lastSec = left;
     const passed = Math.round(b.dur - left);
-    if (left >= 1 && left <= 5) { if (passed >= 2) { say(String(left)); beep(990, 60); } return; } // 剛開始的提示語不被倒數打斷
+    if (left >= 1 && left <= 5) { if (passed >= 2) { say(String(left), b.type === 'prep' ? 'count' : false); beep(990, 60); } return; } // 剛開始的提示語不被倒數打斷
     if (left === 10 && b.dur > 12) { say('最後10秒'); return; }
     if (passed > 0 && passed % 30 === 0 && left > 10 && b.type !== 'prep') say(`還有${left}秒`);
   }
@@ -1500,8 +1516,11 @@ function startPlayer(blocks, title, lv = 0, offerBed = false) {
       el += dt;
       if (b.type === 'prep' && prepWait) {
         // 說明還沒念完：停在倒數 5 秒前等待；語音異常時用估計時間的兩倍作保險
-        if (el > (b.est || 20) * 2 + 10) { prepWait = false; b.dur = el + 5; }
-        else b.dur = Math.max(b.dur, el + 5.01);
+        // 有些手機念完不會通知：估計時間過後、語音也停了就直接開始倒數，最多只多等一點點
+        const ms = el * 1000, est = b.estMs || 15000;
+        const silent = !speechSynthesis.speaking && !speechSynthesis.pending;
+        if ((ms > est + 1200 && silent) || ms > est * 1.35 + 2500) { prepWait = false; b.dur = el + (b.cd || 5); }
+        else b.dur = Math.max(b.dur, el + (b.cd || 5) + 0.01);
       }
     }
     if (el >= b.dur) { go(bi + 1); return; }
@@ -1548,7 +1567,7 @@ function startPlayer(blocks, title, lv = 0, offerBed = false) {
       if (sg !== lastSeg) {
         lastSeg = sg;
         const c = it.cues[sg];
-        if (c) { br.textContent = c; br.dataset.w = /放鬆|回正/.test(c) ? 'out' : 'in'; br.hidden = false; if (el > 0.4 && running) say(c, true); }
+        if (c && b.dur - el > 1.5) { br.textContent = c; br.dataset.w = /放鬆|回正/.test(c) ? 'out' : 'in'; br.hidden = false; if (el > 0.4 && running) say(c, true); }
       }
     } else if (b.type === 'rest' || b.type === 'switch') {
       // 休息時：吸 4 秒、吐 6 秒的恢復呼吸，只有畫面提示
