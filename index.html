@@ -311,6 +311,7 @@ function fitBox(ex) {
   });
   const pr = ex.props || {};
   if (pr.bed) { add([pr.bed[0], pr.bed[1]], 0); add([pr.bed[0] + Math.min(pr.bed[2], 90), 171], 0); }
+  if (pr.wallX) { add([pr.wallX + 14, 20], 0); }
   if (pr.pillow) { add([pr.pillow[0] - pr.pillow[2], pr.pillow[1] - pr.pillow[3]], 0); add([pr.pillow[0] + pr.pillow[2], pr.pillow[1]], 0); }
   if (ex.view !== 'top') y1 = Math.max(y1, 176);
   const pad = 16, AR = 300 / 210;
@@ -331,6 +332,7 @@ function renderPose(ex, f) {
   if (ex.view === 'top') s += `<g transform="rotate(90 150 100)"><rect x="100" y="-40" width="100" height="240" rx="8" class="mat"/>`;
   else s += `<line x1="${(vb[0] - 5).toFixed(0)}" y1="171" x2="${(vb[0] + vb[2] + 5).toFixed(0)}" y2="171" class="floor"/>`;
   if (pr.wall) s += `<rect x="92" y="-18" width="116" height="189" rx="2" class="wall"/>`;
+  if (pr.wallX) s += `<rect x="${pr.wallX}" y="-30" width="14" height="201" class="wall"/>`;
   if (pr.bed) s += `<rect x="${pr.bed[0]}" y="${pr.bed[1]}" width="${pr.bed[2]}" height="${171 - pr.bed[1]}" rx="5" class="prop"/>`;
   if (pr.pillow) s += `<ellipse cx="${pr.pillow[0]}" cy="${pr.pillow[1]}" rx="${pr.pillow[2]}" ry="${pr.pillow[3]}" class="prop"/>`;
   if (f.glow > 0.01) s += `<circle cx="${k.hip[0]}" cy="${k.hip[1]}" r="${(10 + 8 * f.glow).toFixed(1)}" class="glow" opacity="${(0.25 + 0.55 * f.glow).toFixed(2)}"/>`;
@@ -341,6 +343,7 @@ function renderPose(ex, f) {
   s += `<circle cx="${k.head[0].toFixed(1)}" cy="${k.head[1].toFixed(1)}" r="${LEN.HR}" class="head"/>`;
   s += pl(k.LN, 'fig', 7) + pl(k.AN, 'fig', 6.5);
   if (pr.band === 'hands') s += pl([k.AN[2], k.AF[2]], 'band', 2.5);
+  if (pr.band === 'nfoot') s += pl([k.AN[2], k.LN[2]], 'band', 2.5) + pl([k.AF[2], k.LN[2]], 'band', 2);
   if (pr.band === 'feet') s += pl([k.AN[2], k.LN[2]], 'band', 2.5) + pl([k.AF[2], k.LF[2]], 'band', 2);
   (pr.db || []).forEach(n => {
     const h = n === 'n' ? k.AN[2] : k.AF[2];
@@ -704,7 +707,70 @@ Object.assign(EX, {
     tips: ['這個動作能放鬆下背，骨盆前傾的人腰常緊，很適合當最後一個動作。', '起身時先翻到側躺，停幾秒再用手撐坐起來。', BED_SAFE]
   }
 });
-const BEDSET = ['bedhang', 'bedswing', 'bedbutterfly', 'bedhug'];
+
+// ---- 每日伸展：久坐、小腿、腿部線條 ----
+const BODYBED = { p: [204, 114], t: 180, hd: 0, aN: { a: [10, 0] }, aF: { a: [12, 2] } };
+const SIDESTAND = { p: [140, 91], t: -90, hd: 0, lN: { a: [90, 90] }, lF: { a: [92, 92] } };
+Object.assign(EX, {
+  figure4: {
+    name: '仰躺 4 字伸展', tags: ['久坐', '臀部'], kind: 'hold', secs: [30, 45, 60], sets: [1, 1, 1], side: true, props: BEDP,
+    pose: '頭放回床上仰躺，一腳腳踝放到另一腳膝蓋上', brief: ['腳踝跨在另一腳膝蓋上，像數字 4', '雙手抱住下面那條腿往胸口拉', '跨腳那側的臀部有拉扯感'],
+    frames: [
+      { ...BODYBED, lN: { a: [-48, 32] }, lF: { t: [228, 84], b: 1 }, aN: { t: [222, 92] }, aF: { t: [224, 94] } },
+      { ...BODYBED, lN: { a: [-58, 22] }, lF: { t: [222, 78], b: 1 }, aN: { t: [216, 86] }, aF: { t: [218, 88] } }
+    ], dur: [2600, 3000], breath: ['in', 'out'],
+    cue: '吐氣時把腿再拉近一點，臀部放鬆',
+    steps: ['頭放回床上仰躺，雙膝彎曲。', '右腳腳踝放到左腳膝蓋上，右膝往外打開，像數字 4。', '雙手抱住左大腿後側，慢慢往胸口拉，感覺右邊臀部被拉開。', '自然呼吸，時間到換邊。'],
+    tips: ['久坐一整天，臀部深層的肌肉會很緊，容易拉著骨盆和下背。', '肩膀和頭放鬆貼床，不要抬頭用力。', '膝蓋不舒服就不要拉那麼近。']
+  },
+  hamband: {
+    name: '彈力帶後腿與小腿伸展', tags: ['小腿', '腿部線條', '久坐'], kind: 'hold', secs: [30, 45, 60], sets: [1, 1, 1], side: true, props: { ...BEDP, band: 'nfoot' },
+    pose: '仰躺在床上，彈力帶套在一腳腳底', brief: ['彈力帶套住腳掌，腿往天花板伸直', '腳尖往自己勾回，拉到小腿', '另一腳放平，膝蓋可以微彎'],
+    frames: [
+      { ...BODYBED, lN: { a: [-78, -78] }, lF: { a: [2, 2] }, aN: { t: [176, 72] }, aF: { t: [178, 74] } },
+      { ...BODYBED, lN: { a: [-88, -88] }, lF: { a: [2, 2] }, aN: { t: [174, 66] }, aF: { t: [176, 68] } }
+    ], dur: [2600, 3000], breath: ['in', 'out'],
+    cue: '腳尖勾回，吐氣時把腿再帶近一點',
+    steps: ['仰躺在床上，彈力帶套在右腳腳掌，雙手握住兩端。', '右腿往天花板伸直，左腿平放在床上。', '腳尖往自己的方向勾回來，感覺大腿後側和小腿都被拉長。', '吐氣時用彈力帶把腿再帶近一點，時間到換邊。'],
+    tips: ['坐久了大腿後側和小腿會變短變緊，這個動作一次拉到兩個地方。', '膝蓋微彎沒關係，不要硬鎖直。', '下背貼著床，不要為了拉近而拱腰。']
+  },
+  wallcalf: {
+    name: '推牆小腿伸展', tags: ['小腿', '腿部線條'], kind: 'hold', secs: [30, 45, 45], sets: [1, 1, 1], side: true, props: { wallX: 204 },
+    pose: '面對牆站，雙手推牆，一腳往後跨', brief: ['後腳伸直，腳跟踩穩地板', '前腳膝蓋彎曲，身體往牆靠', '後腳小腿有拉扯感'],
+    frames: [
+      { p: [150, 100], t: -76, hd: 8, lN: { t: [178, 170], b: -1 }, lF: { a: [118, 118] }, aN: { t: [200, 52] }, aF: { t: [200, 56] } },
+      { p: [154, 101], t: -72, hd: 8, lN: { t: [178, 170], b: -1 }, lF: { a: [116, 116] }, aN: { t: [200, 54] }, aF: { t: [200, 58] } }
+    ], dur: [2600, 3000], breath: ['in', 'out'],
+    cue: '後腳跟不要離地，吐氣時身體再往牆靠一點',
+    steps: ['面對牆站，雙手與肩同高推著牆。', '右腳往後跨一大步，腳跟踩地、腳尖朝前，膝蓋伸直。', '左膝彎曲，身體往牆靠，感覺右邊小腿肚被拉開。', '時間到換邊。'],
+    tips: ['後腳腳尖要朝正前方，不要外八。', '感覺不到拉扯就把後腳再往後一點。', '久坐和穿高跟鞋都會讓小腿變緊，拉開後小腿線條會比較修長。']
+  },
+  calfraise: {
+    name: '扶牆慢速踮腳', tags: ['小腿', '腿部線條'], kind: 'reps', reps: [12, 15, 20], sets: [2, 2, 2], rpc: 1, rest: 30, props: { wallX: 182 },
+    pose: '側身或面對牆站，手輕扶牆', brief: ['腳跟慢慢踮高', '頂端停一下', '用 3 秒慢慢放下'],
+    frames: [
+      { ...SIDESTAND, aN: { t: [182, 40] }, aF: { t: [182, 44] } },
+      { ...SIDESTAND, p: [140, 82], lN: { a: [90, 90], s: [1, 1.22] }, lF: { a: [92, 92], s: [1, 1.22] }, aN: { t: [182, 32] }, aF: { t: [182, 36] } },
+      { ...SIDESTAND, p: [140, 82], lN: { a: [90, 90], s: [1, 1.22] }, lF: { a: [92, 92], s: [1, 1.22] }, aN: { t: [182, 32] }, aF: { t: [182, 36] } }
+    ], dur: [1300, 600, 2400], breath: ['out', null, 'in'],
+    cue: '踮高停一下，用 3 秒慢慢放下',
+    steps: ['雙腳與髖同寬站好，手輕扶牆保持平衡。', '吐氣，腳跟慢慢踮高，重心在大拇趾和第二趾。', '頂端停一秒，吸氣，用三秒慢慢放下，腳跟輕碰地再起來。', '身體保持直立，不要往前倒。'],
+    tips: ['慢慢放下是重點，練的是線條和穩定，不是爆發力。', '腳踝不要往外翻。', '做完接著做推牆小腿伸展，小腿比較不會僵硬。']
+  },
+  legsup: {
+    name: '靠牆抬腿放鬆', tags: ['腿部線條', '久坐', '放鬆'], kind: 'hold', secs: [60, 90, 120], sets: [1, 1, 1], props: { wallX: 214 },
+    pose: '躺在瑜伽墊上，臀部靠近牆，雙腿靠牆伸直', brief: ['臀部盡量靠近牆', '雙腿沿著牆往上伸直', '雙手放鬆，慢慢呼吸'],
+    frames: [
+      { p: [206, 162], t: 180, hd: 0, lN: { a: [-90, -90] }, lF: { a: [-91, -91] }, aN: { a: [150, 180] }, aF: { a: [152, 182] } },
+      { p: [206, 162], t: 180, hd: 0, lN: { a: [-90, -90] }, lF: { a: [-91, -91] }, aN: { a: [146, 176] }, aF: { a: [148, 178] } }
+    ], dur: [3200, 3800], breath: ['in', 'out'],
+    cue: '雙腿放鬆靠牆，跟著光圈慢慢呼吸',
+    steps: ['側坐在牆邊，臀部貼近牆。', '躺下的同時把雙腿轉上牆，沿著牆伸直。', '雙手放身體兩側，閉眼慢慢呼吸。', '結束時膝蓋彎曲，翻到側躺，再慢慢坐起。'],
+    tips: ['久坐一整天腿容易水腫，抬高雙腿能幫助回流，腿看起來比較輕盈。', '腿後側太緊伸不直，就讓臀部離牆遠一點。', '腳麻就把膝蓋彎起來休息。']
+  }
+});
+EX.figure4.gear = ['床']; EX.hamband.gear = ['床', '彈力帶']; EX.wallcalf.gear = ['牆']; EX.calfraise.gear = ['牆']; EX.legsup.gear = ['瑜伽墊', '牆'];
+const BEDSET = ['bedhang', 'bedswing', 'bedbutterfly', 'bedhug', 'figure4', 'hamband', 'calfraise', 'wallcalf', 'legsup'];
 
 // 呼吸提示：對應每一段動畫（第 i 個畫面到下一個畫面），out＝吐氣、in＝吸氣
 const BREATH = {
@@ -841,37 +907,37 @@ function totalMin(key, lv) { return Math.round(buildBlocks(key, lv).reduce((a, b
 // ---------- 臉部刮痧拉提 ----------
 // mode: slide 單向刮 / fan 多條短刮輪流 / press 逐點按壓 / pluck 小幅撥動
 const GUASHA = [
-  { name: '頸部疏通：耳下到鎖骨', goal: '輪廓', mode: 'slide', path: 'M202 150 Q196 200 186 246', strokes: 6, unit: 1700, lab: '次',
+  { zone: '下臉與頸部', name: '頸部疏通：耳下到鎖骨', goal: '輪廓', mode: 'slide', path: 'M202 150 Q196 200 186 246', strokes: 6, unit: 3000, lab: '次',
     tool: '板子平貼', brief: ['板子平貼在耳下', '往下刮到鎖骨', '只往下，不來回'],
     note: '刮痧板平貼，從耳下往下刮到鎖骨。先把出口打開，後面往外刮的水分才有地方走。' },
-  { name: '下顎線拉提', goal: '輪廓', mode: 'slide', path: 'M158 192 Q186 182 203 146', strokes: 8, unit: 1700, lab: '次',
+  { zone: '下臉與頸部', name: '下顎線拉提', goal: '輪廓', mode: 'slide', path: 'M158 192 Q186 182 203 146', strokes: 8, unit: 3000, lab: '次',
     tool: '用凹口卡住下顎骨', brief: ['凹口卡住下巴的下顎骨', '沿下顎線刮到耳下', '最後一下在耳下停住，輕抖 2 秒'],
     note: '用板子的凹口卡住下顎骨，從下巴往耳下刮。最後一下在耳下停住，輕輕抖動 2 秒。' },
-  { name: '咬肌撥鬆', goal: '輪廓', mode: 'pluck', path: 'M186 130 L191 162', pts: 4, strokes: 12, unit: 1000, amp: 6, lab: '下',
+  { zone: '下臉與頸部', name: '咬肌撥鬆', goal: '輪廓', mode: 'pluck', path: 'M186 130 L191 162', pts: 4, strokes: 12, unit: 1700, amp: 6, lab: '下',
     tool: '用板子邊緣', brief: ['牙齒放鬆', '邊緣壓在咬肌，前後小幅度撥動', '由上往下換 4 個位置'],
     note: '牙齒放鬆，用板子邊緣壓在咬肌上，前後小幅度撥動。由上往下換四個位置，每個位置撥三下。咬肌放鬆，下半臉會比較不方。' },
-  { name: '嘴角往耳前', goal: '輪廓', mode: 'slide', path: 'M166 158 Q186 146 206 128', strokes: 8, unit: 1700, lab: '次',
+  { zone: '臉頰', name: '嘴角往耳前', goal: '輪廓', mode: 'slide', path: 'M166 158 Q186 146 206 128', strokes: 8, unit: 3000, lab: '次',
     tool: '長邊平貼', brief: ['從嘴角外側開始', '往耳前方向刮'],
     note: '從嘴角外側往耳前方向刮，拉提嘴角和法令紋一帶。' },
-  { name: '顴骨下往耳前', goal: '輪廓', mode: 'slide', path: 'M160 126 Q184 120 206 106', strokes: 8, unit: 1700, lab: '次',
+  { zone: '臉頰', name: '顴骨下往耳前', goal: '輪廓', mode: 'slide', path: 'M160 126 Q184 120 206 106', strokes: 8, unit: 3000, lab: '次',
     tool: '長邊平貼', brief: ['從鼻翼旁開始', '沿顴骨下緣凹處刮到耳前', '最後一下在耳前停住，輕抖'],
     note: '從鼻翼旁沿顴骨下緣的凹處刮到耳前，最後一下在耳前停住輕抖。' },
-  { name: '眼下：內眼角往太陽穴', goal: '眼周細紋', mode: 'slide', path: 'M162 106 Q180 110 198 100', strokes: 5, unit: 2000, lab: '次',
+  { zone: '眼周', name: '眼下：內眼角往太陽穴', goal: '眼周細紋', mode: 'slide', path: 'M162 106 Q180 110 198 100', strokes: 5, unit: 3200, lab: '次',
     tool: '最平滑的邊', brief: ['從內眼角下方開始', '只靠板子重量滑到太陽穴', '速度放慢，不往下壓'],
     note: '換板子最平滑的邊，從內眼角下方，沿著眼眶下緣慢慢滑到太陽穴。只用板子本身的重量，不往下壓。' },
-  { name: '魚尾紋：眼尾往斜上推', goal: '魚尾紋', mode: 'fan', paths: ['M184 104 L200 94', 'M184 98 L201 86', 'M184 92 L199 78'], strokes: 9, unit: 1400, lab: '次',
+  { zone: '眼周', name: '魚尾紋：眼尾往斜上推', goal: '魚尾紋', mode: 'fan', paths: ['M184 104 L200 94', 'M184 98 L201 86', 'M184 92 L199 78'], strokes: 9, unit: 2600, lab: '次',
     tool: '板子短邊', brief: ['另一手兩指輕按太陽穴固定皮膚', '從眼尾分三條往斜上方短刮', '皮膚不要被拉動'],
     note: '另一手兩指輕按太陽穴、固定眼尾皮膚，板子從眼尾分三條往斜上方短刮，每條三次。力道很輕，皮膚不要被拉動。' },
-  { name: '眉骨提拉', goal: '眼周細紋', mode: 'slide', path: 'M156 84 Q180 74 204 86', strokes: 6, unit: 1700, lab: '次',
+  { zone: '眼周', name: '眉骨提拉', goal: '眼周細紋', mode: 'slide', path: 'M156 84 Q180 74 204 86', strokes: 6, unit: 3000, lab: '次',
     tool: '用凹口卡住眉骨', brief: ['凹口卡住眉頭下方的眉骨', '刮到眉尾，再帶到太陽穴'],
     note: '用板子凹口卡住眉骨，從眉頭刮到眉尾，再帶到太陽穴。眉骨放鬆，上眼皮比較不會往下壓。' },
-  { name: '額頭往髮際線', goal: '輪廓', mode: 'fan', paths: ['M158 72 L162 46', 'M172 72 L178 48', 'M186 76 L196 52'], strokes: 9, unit: 1400, lab: '次',
+  { zone: '額頭', name: '額頭往髮際線', goal: '輪廓', mode: 'fan', paths: ['M158 72 L162 46', 'M172 72 L178 48', 'M186 76 L196 52'], strokes: 9, unit: 2600, lab: '次',
     tool: '長邊平貼', brief: ['從眉毛上方往上刮到髮際線', '分三條，由中間往外側移動'],
     note: '從眉毛上方往上刮到髮際線，分三條由中間往外側移動，每條三次。額頭放鬆也能幫眉眼往上提。' },
-  { name: '太陽穴按壓', goal: '魚尾紋', mode: 'press', path: 'M199 82 L203 96', pts: 3, strokes: 6, unit: 1300, lab: '下',
+  { zone: '額頭', name: '太陽穴按壓', goal: '魚尾紋', mode: 'press', path: 'M199 82 L203 96', pts: 3, strokes: 6, unit: 2200, lab: '下',
     tool: '用圓角', brief: ['圓角輕壓太陽穴', '每點停一秒再放開', '往下換三個點'],
     note: '用板子的圓角輕壓太陽穴，每點停一秒再放開，由上往下換三個點，每個點壓兩次。' },
-  { name: '收尾：太陽穴經耳前到鎖骨', goal: '輪廓', mode: 'slide', path: 'M204 88 Q212 118 202 150 Q196 200 186 246', strokes: 5, unit: 1800, lab: '次',
+  { zone: '額頭', name: '收尾：太陽穴經耳前到鎖骨', goal: '輪廓', mode: 'slide', path: 'M204 88 Q212 118 202 150 Q196 200 186 246', strokes: 5, unit: 3200, lab: '次',
     tool: '板子平貼', brief: ['從太陽穴開始', '經耳前、耳下刮到鎖骨'],
     note: '板子平貼，從太陽穴一路經耳前、耳下刮到鎖骨，把水分往下帶走。' }
 ];
@@ -1169,11 +1235,11 @@ function renderBody() {
     <button class="start" id="startBtn">開始跟練（約 ${mins} 分鐘）</button>
     ${gearBox(gearSummary(ids), '今天會用到')}
     ${sec('暖身', WARM)}${sec('主訓練', R.main)}${sec('收操', COOL)}
-    <h2 style="margin-top:34px">每日床邊伸展</h2>
+    <h2 style="margin-top:34px">每日伸展</h2>
     <p class="sub" style="margin:0 0 10px">每天都做，約 ${listMin(BEDSET, S.lv)} 分鐘。可以接在訓練後，也可以睡前另外做。</p>
     <ol class="list">${BEDSET.map(id => row(id, n++)).join('')}</ol>
-    <button class="start" id="bedBtn" style="background:var(--plum);color:var(--cream)">開始床邊伸展（約 ${listMin(BEDSET, S.lv)} 分鐘）</button>
-    ${gearBox(gearSummary(BEDSET), '床邊伸展會用到')}
+    <button class="start" id="bedBtn" style="background:var(--plum);color:var(--cream)">開始每日伸展（約 ${listMin(BEDSET, S.lv)} 分鐘）</button>
+    ${gearBox(gearSummary(BEDSET), '每日伸展會用到')}
     <p class="note" style="margin-top:0">頭懸在床邊時，床緣要對齊肩膀上緣，不是脖子中間。有高血壓、青光眼或眼壓高、頸椎問題、懷孕或容易頭暈的人先不要做頭部懸空，可以把頭放在床上做束腳和抱腿。過程中頭暈、頭痛或眼睛脹就停下來，起身時先翻到側躺再慢慢坐起。</p>
     ${key === 'R' ? '<p class="note">今天讓身體休息。做完伸展，可以接著到「臉部刮痧」。</p>' : ''}
     ${key === 'L' ? '<p class="note">星期四去練習場，所以只排核心精簡版。打完球回家做也可以。</p>' : ''}
@@ -1185,7 +1251,7 @@ function renderBody() {
   app.querySelectorAll('[data-lv]').forEach(b => (b.onclick = () => { S.lv = +b.dataset.lv; render(); }));
   app.querySelectorAll('[data-ex]').forEach(b => (b.onclick = () => openSheet(b.dataset.ex)));
   $('#startBtn').onclick = () => startPlayer(buildBlocks(key, S.lv), R.name, S.lv, true);
-  $('#bedBtn').onclick = () => startPlayer(buildList(BEDSET, S.lv), '每日床邊伸展', S.lv);
+  $('#bedBtn').onclick = () => startPlayer(buildList(BEDSET, S.lv), '每日伸展', S.lv);
 }
 
 function openSheet(id) {
@@ -1213,6 +1279,14 @@ function openSheet(id) {
 function guaBlocks() {
   const blocks = [{ type: 'gear', face: true, dur: 0 }];
   GUA.forEach((g, i) => {
+    // 臉部運動做完先留時間擦油；刮痧換到不同部位時留時間補油
+    const prevG = GUA[i - 1];
+    if (!g.fx && prevG && prevG.fx) blocks.push({ type: 'oil', gua: i, dur: 45, first: true,
+      say: '臉部運動完成，接下來刮痧。請在臉和脖子擦上足量的油或精華，拿起刮痧板。慢慢來，準備好也可以直接按下一步。',
+      cue: '臉和脖子都要擦到，板子要能順滑不卡' });
+    else if (!g.fx && prevG && !prevG.fx && g.zone !== prevG.zone) blocks.push({ type: 'oil', gua: i, dur: g.zone === '眼周' ? 20 : 15,
+      say: g.zone === '眼周' ? '換到眼周，先補一點油或眼霜，眼周皮膚薄，要更滑一點。' : `換到${g.zone}，先補一點油。`,
+      cue: g.zone === '眼周' ? '眼周補油或眼霜，力道放到最輕' : `${g.zone}補一點油，再繼續` });
     blocks.push({ type: 'prep', gua: i, dur: Math.max(5, Math.ceil(speechSec(facePrepText(g)) + (g.fx ? 3 : 5))) });
     const d = Math.round(g.strokes * g.unit / 1000);
     if (g.fx) { blocks.push({ type: 'work', gua: i, reps: g.strokes, dur: d }); return; }
@@ -1377,6 +1451,14 @@ function createAwake() {
   };
 }
 
+// 整個工具共用一個，不在跟練結束時關掉
+let AWAKE = null;
+function keepAwake() {
+  if (!AWAKE) { AWAKE = createAwake(); AWAKE.start(); }
+  else AWAKE.poke();
+}
+['pointerdown', 'touchend', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, keepAwake, { passive: true, capture: true }));
+
 // ---------- 跟練 ----------
 function startPlayer(blocks, title, lv = 0, offerBed = false) {
   unlockAudio();
@@ -1385,8 +1467,8 @@ function startPlayer(blocks, title, lv = 0, offerBed = false) {
   let prepWait = false, prepToken = 0;
   const total = blocks.reduce((a, b) => a + b.dur, 0);
   const exCount = new Set(blocks.filter(b => b.type !== 'gear').map(b => b.idx ?? b.gua)).size;
-  const awake = createAwake();
-  awake.start();
+  keepAwake();
+  const awake = AWAKE;
   const node = document.createElement('div');
   node.className = 'player';
   node.innerHTML = `<div class="in">
@@ -1413,7 +1495,7 @@ function startPlayer(blocks, title, lv = 0, offerBed = false) {
   const nextWork = i => { for (let j = i; j < blocks.length; j++) if (blocks[j].type === 'work') return blocks[j]; return null; };
   const setVoiceLabel = () => (q('pVoice').textContent = voiceOn ? '語音開' : '語音關');
   setVoiceLabel();
-  const isTimed = b => b.type !== 'gear' && (b.type === 'rest' || b.type === 'switch' || b.type === 'prep' || (b.type === 'work' && !itemOf(b).face && itemOf(b).kind === 'hold'));
+  const isTimed = b => b.type !== 'gear' && (b.type === 'oil' || b.type === 'rest' || b.type === 'switch' || b.type === 'prep' || (b.type === 'work' && !itemOf(b).face && itemOf(b).kind === 'hold'));
 
   const gearOf = b => b.face
     ? { tools: ['刮痧板', '臉部油或精華'], places: ['鏡子前（坐或站）'], use: {} }
@@ -1435,10 +1517,11 @@ function startPlayer(blocks, title, lv = 0, offerBed = false) {
       say(`${head ? head + '，' : ''}${amount}，開始`);
     } else if (b.type === 'rest') say(`休息${b.dur}秒`);
     else if (b.type === 'switch') say(b.gua !== undefined ? '換左臉' : '換邊');
+    else if (b.type === 'oil') say(b.say);
     else if (b.type === 'prep') {
       // 說明念完才開始最後 5 秒倒數
       const txt = it.face
-        ? (b.gua === FX.length ? '臉部運動完成，接下來刮痧。先在臉和脖子擦上足量的油或精華，拿起刮痧板。畫面就像鏡子，每個動作先做右臉，再做左臉。' : '') + facePrepText(it)
+        ? (b.gua === FX.length ? '畫面就像鏡子，每個動作先做右臉，再做左臉。' : '') + facePrepText(it)
         : (b.extra || '') + prepText(it);
       const token = ++prepToken, est = speechSec(txt);
       const u = say(txt, false, () => {
@@ -1456,17 +1539,17 @@ function startPlayer(blocks, title, lv = 0, offerBed = false) {
     bi = Math.max(0, i); el = 0; lastSec = -1; lastSeg = -1; announce(); beep(660, 140);
   }
   function finish() {
-    running = false; cancelAnimationFrame(raf); awake.stop();
+    running = false; cancelAnimationFrame(raf); awake.poke();
     say('全部完成，做得很好');
     node.querySelector('.in').innerHTML = `<div class="done"><h2>完成了</h2>
-      <p>${esc(title)}，共 ${exCount} 個項目，約 ${Math.round(total / 60)} 分鐘。<br>${offerBed ? '別忘了今天的床邊伸展。' : '記得到習慣追蹤器打勾。'}</p>
-      ${offerBed ? '<button class="start" id="pBed">接著做床邊伸展（約 ' + listMin(BEDSET, lv) + ' 分鐘）</button>' : ''}
+      <p>${esc(title)}，共 ${exCount} 個項目，約 ${Math.round(total / 60)} 分鐘。<br>${offerBed ? '別忘了今天的每日伸展。' : '記得到習慣追蹤器打勾。'}</p>
+      ${offerBed ? '<button class="start" id="pBed">接著做每日伸展（約 ' + listMin(BEDSET, lv) + ' 分鐘）</button>' : ''}
       <button class="start" id="pBack" style="background:rgba(255,255,255,.12);color:var(--cream)">回到首頁</button></div>`;
     node.querySelector('#pBack').onclick = close;
-    if (offerBed) node.querySelector('#pBed').onclick = () => { close(); startPlayer(buildList(BEDSET, lv), '每日床邊伸展', lv); };
+    if (offerBed) node.querySelector('#pBed').onclick = () => { close(); startPlayer(buildList(BEDSET, lv), '每日伸展', lv); };
   }
   function close() {
-    cancelAnimationFrame(raf); awake.stop();
+    cancelAnimationFrame(raf); awake.poke();
     try { speechSynthesis.cancel(); } catch (e) {}
     node.remove(); document.body.style.overflow = '';
   }
@@ -1609,12 +1692,12 @@ function startPlayer(blocks, title, lv = 0, offerBed = false) {
       }
       q('pCue').textContent = '';
     } else {
-      const label = { rest: '休息', prep: '準備', switch: b.gua !== undefined ? '換左臉' : '換邊' }[b.type];
+      const label = { rest: '休息', prep: '準備', oil: b.first ? '擦油' : '補油', switch: b.gua !== undefined ? '換左臉' : '換邊' }[b.type];
       q('pName').textContent = label;
-      q('pState').textContent = b.type === 'rest' ? `下一組：${sit.name}` : sit.name;
+      q('pState').textContent = b.type === 'rest' ? `下一組：${sit.name}` : b.type === 'oil' ? `接著：${sit.name}` : sit.name;
       if (b.type === 'prep' && prepWait) { q('pBig').textContent = '…'; q('pUnit').textContent = '語音說明中'; }
       else { q('pBig').textContent = left; q('pUnit').textContent = '秒'; }
-      q('pCue').textContent = b.type === 'rest' ? '喝口水，跟著光圈慢慢呼吸' : '';
+      q('pCue').textContent = b.type === 'rest' ? '喝口水，跟著光圈慢慢呼吸' : b.type === 'oil' ? b.cue : '';
     }
   }
 
